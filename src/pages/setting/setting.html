@@ -1,0 +1,25 @@
+<ion-header>
+    <ion-toolbar>
+        <ion-title>Settings</ion-title>
+    </ion-toolbar>
+</ion-header>
+
+<ion-content>
+    <ion-list>
+        <ion-item (click)="changePassword()">
+            <ion-icon item-start name="key" class="txt-clr"></ion-icon>
+            <h2 class="txt-clr">Change Password</h2>
+            <ion-icon item-end ios="ios-arrow-forward" md="ios-arrow-forward" class="txt-clr"></ion-icon>
+        </ion-item>
+        <ion-item (click)="appInfo()">
+            <ion-icon item-start name="information-circle" class="txt-clr"></ion-icon>
+            <h2 class="txt-clr">App Info</h2>
+            <ion-icon item-end ios="ios-arrow-forward" md="ios-arrow-forward" class="txt-clr"></ion-icon>
+        </ion-item>
+        <ion-item (click)="legalInfo()">
+            <ion-icon item-start ios="ios-alert-outline" md="ios-alert-outline" class="txt-clr"></ion-icon>
+            <h2 class="txt-clr">Legal Info</h2>
+            <ion-icon item-end ios="ios-arrow-forward" md="ios-arrow-forward" class="txt-clr"></ion-icon>
+        </ion-item>
+    </ion-list>
+</ion-content>

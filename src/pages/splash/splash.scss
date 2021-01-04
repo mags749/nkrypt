@@ -1,0 +1,77 @@
+.ios,
+.md {
+    splash-page {
+        .splsh-cntnt {
+            font-family: 'Aaargh', cursive !important;
+            display: flex !important;
+            justify-content: center !important;
+            align-items: center !important;
+            font-size: 5.2em;
+            color: black;
+            height: 100%;
+            position: relative;
+        }
+        .cntnt {
+            position: fixed;
+            z-index: 1;
+            animation-name: leaves;
+            animation-duration: 30000ms;
+            animation-iteration-count: infinite;
+            animation-timing-function: linear;
+        }
+        .spinner1 {
+            position: fixed;
+            z-index: 3;
+            animation-name: spinc;
+            animation-duration: 30000ms;
+            animation-iteration-count: infinite;
+            animation-timing-function: linear;
+        }
+        .spinner2 {
+            position: fixed;
+            z-index: 4;
+            animation-name: spinac;
+            animation-duration: 30000ms;
+            animation-iteration-count: infinite;
+            animation-timing-function: linear;
+        }
+        @keyframes spinc {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+        @keyframes spinac {
+            from {
+                transform: rotate(360deg);
+            }
+            to {
+                transform: rotate(0deg);
+            }
+        }
+        @keyframes leaves {
+            0% {
+                transform: scale(1.0);
+            }
+            100% {
+                transform: scale(2.0);
+            }
+        }
+
+        ion-slides {
+            color: $kryptTxtClr;
+        }
+        .aggr-cntnt {
+            text-align: justify;
+            overflow-x: hidden;
+            overflow-y: scroll;
+            padding: 10px;
+            font-size: 15px;
+        }
+        .fit-wdth {
+            width: 100%;
+        }
+    }
+}

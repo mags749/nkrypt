@@ -1,0 +1,75 @@
+{
+  "name": "nkrypt",
+  "version": "1.0.0",
+  "description": "nkrypt is an offline app using which user can store digital data in encrypted format using AES-256 and could be viewed by him/her whenever needed.",
+  "main": "app.js",
+  "private": true,
+  "scripts": {
+    "clean": "ionic-app-scripts clean",
+    "build": "ionic-app-scripts build",
+    "lint": "ionic-app-scripts lint",
+    "ionic:build": "ionic-app-scripts build",
+    "ionic:serve": "ionic-app-scripts serve"
+  },
+  "keywords": [
+    "ionic",
+    "angular",
+    "krypt"
+  ],
+  "author": "mags749",
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://mags749@bitbucket.org/mags749/vault.git"
+  },
+  "homepage": "https://bitbucket.org/mags749/vault#readme",
+  "dependencies": {
+    "@angular/common": "5.0.0",
+    "@angular/compiler": "5.0.0",
+    "@angular/compiler-cli": "5.0.0",
+    "@angular/core": "5.0.0",
+    "@angular/forms": "5.0.0",
+    "@angular/http": "5.0.0",
+    "@angular/platform-browser": "5.0.0",
+    "@angular/platform-browser-dynamic": "5.0.0",
+    "@ionic-native/clipboard": "^4.6.0",
+    "@ionic-native/core": "^4.6.0",
+    "@ionic-native/status-bar": "^4.6.0",
+    "@ionic/storage": "^2.1.3",
+    "cordova-android": "7.0.0",
+    "cordova-clipboard": "^1.1.1",
+    "cordova-plugin-device": "^1.1.4",
+    "cordova-plugin-ionic-webview": "^1.1.16",
+    "cordova-plugin-statusbar": "^2.4.1",
+    "cordova-plugin-whitelist": "^1.3.1",
+    "cordova-sqlite-storage": "^2.3.0",
+    "crypto-browserify": "^3.12.0",
+    "ionic-angular": "3.9.2",
+    "ionic-plugin-keyboard": "^2.2.1",
+    "ionicons": "^3.0.0",
+    "npm": "^5.8.0",
+    "rxjs": "5.5.2",
+    "zone.js": "0.8.18"
+  },
+  "devDependencies": {
+    "@ionic/app-scripts": "3.1.0",
+    "typescript": "2.4.2"
+  },
+  "cordova": {
+    "plugins": {
+      "ionic-plugin-keyboard": {},
+      "cordova-plugin-whitelist": {},
+      "cordova-plugin-device": {},
+      "cordova-plugin-ionic-webview": {},
+      "cordova-sqlite-storage": {},
+      "cordova-plugin-statusbar": {},
+      "cordova-clipboard": {}
+    },
+    "platforms": [
+      "android"
+    ]
+  },
+  "externals": {
+    "crypto": "crypto"
+  }
+}

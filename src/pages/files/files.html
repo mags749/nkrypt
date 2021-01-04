@@ -1,0 +1,48 @@
+<ion-header>
+    <ion-toolbar>
+        <ion-title>{{this.folderName}} Files</ion-title>
+        <ion-buttons end>
+            <button ion-button icon-only (click)="presentActionSheet()">
+                <ion-icon name="menu"></ion-icon>
+            </button>
+        </ion-buttons>
+    </ion-toolbar>
+</ion-header>
+
+<ion-content>
+    <div id="vlInfo">
+        <div class="vl-info" *ngIf="showPwd">
+            <h3>
+                <strong>{{contentValue}}</strong>
+            </h3>
+        </div>
+    </div>
+    <br *ngIf="showPwd" />
+    <ion-card color="cardclr" *ngFor="let item of items; let i = index">
+        <ion-card-header class="item-kry">
+            {{ item.key }}
+        </ion-card-header>
+        <ion-card-content>
+            <ion-grid>
+                <ion-row>
+                    <ion-col col-4>
+                        <button ion-button block round (click)="editFile(i)">
+                            <ion-icon ios="md-create" md="md-create" class="bgico"></ion-icon>
+                        </button>
+                    </ion-col>
+                    <ion-col col-4>
+                        <button ion-button block round (click)="copyValue(item)">
+                            <ion-icon ios="ios-copy" md="ios-copy" class="bgico"></ion-icon>
+                        </button>
+                    </ion-col>
+                    <ion-col col-4>
+                        <button ion-button block round (click)="showEncValue(item)">
+                            <ion-icon name="eye" class="bgico" *ngIf="encKey == ''"></ion-icon>
+                            <ion-icon name="eye-off" class="bgico" *ngIf="encKey != ''"></ion-icon>
+                        </button>
+                    </ion-col>
+                </ion-row>
+            </ion-grid>
+        </ion-card-content>
+    </ion-card>
+</ion-content>
