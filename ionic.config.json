@@ -1,8 +1,0 @@
-{
-  "name": "nkrypt",
-  "app_id": "nkrypt",
-  "type": "ionic-angular",
-  "integrations": {
-    "cordova": {}
-  }
-}
