@@ -1,4 +1,48 @@
 {
-  "name": "nkrypt",
-  "displayName": "nkrypt"
+  "expo": {
+    "name": "nkrypt",
+    "slug": "nkrypt",
+    "version": "2.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "scheme": "nkrypt",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#09090B"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "io.nkrypt.starter",
+      "infoPlist": {
+        "NSFaceIDUsageDescription": "Used to unlock your nkrypt vault"
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#09090B"
+      },
+      "package": "io.nkrypt.starter"
+    },
+    "plugins": [
+      [
+        "expo-router",
+        {
+          "root": "src/app"
+        }
+      ],
+      "expo-sqlite",
+      "expo-font",
+      "expo-local-authentication"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
 }
