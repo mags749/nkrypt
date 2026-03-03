@@ -1,11 +1,11 @@
 import React from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Text, View, XStack, YStack } from "tamagui";
 
 import { useColors } from "@context/providers/themeStore";
 import { BxIcon } from "@shared/components/BxIcon";
 import { PassKeyInput } from "@shared/components/PassKeyInput";
 import { InputField } from "@shared/components/ui";
-import { Spacing, Typography } from "@shared/constants/design";
+import { Spacing } from "@shared/constants/design";
 
 interface ChangePassKeyVerifyStepProps {
   passPhrase: string;
@@ -28,16 +28,20 @@ export const ChangePassKeyVerifyStep = ({
 }: ChangePassKeyVerifyStepProps) => {
   const colors = useColors();
   return (
-    <View style={styles.container}>
-      <Text style={[styles.title, { color: colors.textPrimary }]}>
+    <YStack gap={Spacing["2xl"]}>
+      <Text
+        fontSize={26}
+        fontWeight="600"
+        letterSpacing={-0.5}
+        color={colors.textPrimary}
+      >
         Verify Identity
       </Text>
-      <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
+      <Text fontSize={15} color={colors.textSecondary} lineHeight={22}>
         Enter your current Pass Phrase and Pass Key to continue.
       </Text>
 
-      {/* Pass Phrase (text) */}
-      <View style={styles.inputWrapper}>
+      <View style={{ position: "relative" }}>
         <InputField
           label="Current Pass Phrase"
           value={passPhrase}
@@ -48,47 +52,40 @@ export const ChangePassKeyVerifyStep = ({
           autoCorrect={false}
           error={errors.passPhrase}
         />
-        <TouchableOpacity
+        <XStack
           onPress={onToggleShowPassPhrase}
-          style={styles.eyeBtn}
-          activeOpacity={0.7}
+          style={{
+            position: "absolute",
+            right: 0,
+            bottom: Spacing.xl,
+            padding: Spacing.sm,
+          }}
+          pressStyle={{ opacity: 0.7 }}
         >
           <BxIcon
             name={showPassPhrase ? "bx-hide" : "bx-show"}
             size={18}
             color={colors.textTertiary}
           />
-        </TouchableOpacity>
+        </XStack>
       </View>
 
-      {/* Current Pass Key (numeric) */}
-      <View style={styles.keyBlock}>
-        <Text style={[styles.label, { color: colors.textTertiary }]}>
+      <YStack gap={Spacing.md} alignItems="center">
+        <Text
+          color={colors.textTertiary}
+          fontSize={11}
+          fontWeight="600"
+          letterSpacing={1.2}
+        >
           CURRENT PASS KEY
         </Text>
         <PassKeyInput value={currentKey} onChange={onKeyChange} />
         {errors.currentKey && (
-          <Text style={[styles.error, { color: colors.error }]}>
+          <Text color={colors.error} fontSize={12}>
             {errors.currentKey}
           </Text>
         )}
-      </View>
-    </View>
+      </YStack>
+    </YStack>
   );
 };
-
-const styles = StyleSheet.create({
-  container: { gap: Spacing["2xl"] },
-  title: { fontSize: 26, fontWeight: "600", letterSpacing: -0.5 },
-  subtitle: { ...Typography.bodyMD, lineHeight: 22 },
-  inputWrapper: { position: "relative" },
-  eyeBtn: {
-    position: "absolute",
-    right: 0,
-    bottom: Spacing.xl,
-    padding: Spacing.sm,
-  },
-  label: { ...Typography.labelMD, letterSpacing: 1.2 },
-  keyBlock: { gap: Spacing.md, alignItems: "center" },
-  error: { ...Typography.caption },
-});

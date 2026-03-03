@@ -1,9 +1,9 @@
 import React from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Text, View, XStack, YStack } from "tamagui";
 
 import { useColors } from "@context/providers/themeStore";
 import { BxIcon, type BxIconName } from "@shared/components/BxIcon";
-import { Spacing, Typography } from "@shared/constants/design";
+import { Spacing } from "@shared/constants/design";
 
 interface SettingRowProps {
   icon: BxIconName;
@@ -24,35 +24,42 @@ export const SettingRow = ({
 }: SettingRowProps) => {
   const colors = useColors();
   return (
-    <TouchableOpacity
+    <XStack
       onPress={onPress}
-      activeOpacity={onPress ? 0.7 : 1}
-      style={styles.row}
+      alignItems="center"
+      paddingHorizontal={Spacing.lg}
+      paddingVertical={Spacing.md}
+      gap={Spacing.md}
+      pressStyle={onPress ? { opacity: 0.7 } : undefined}
     >
-      <View
-        style={[styles.badge, { backgroundColor: colors.surfaceSecondary }]}
+      <XStack
+        width={34}
+        height={34}
+        borderRadius={8}
+        backgroundColor={colors.surfaceSecondary}
+        alignItems="center"
+        justifyContent="center"
       >
         <BxIcon
           name={icon}
           size={18}
           color={danger ? colors.error : colors.textPrimary}
         />
-      </View>
-      <View style={styles.content}>
+      </XStack>
+      <YStack flex={1} gap={2}>
         <Text
-          style={[
-            styles.label,
-            { color: danger ? colors.error : colors.textPrimary },
-          ]}
+          fontSize={15}
+          fontWeight="500"
+          color={danger ? colors.error : colors.textPrimary}
         >
           {label}
         </Text>
         {sublabel && (
-          <Text style={[styles.sublabel, { color: colors.textTertiary }]}>
+          <Text fontSize={12} color={colors.textTertiary}>
             {sublabel}
           </Text>
         )}
-      </View>
+      </YStack>
       {rightElement ??
         (onPress && (
           <BxIcon
@@ -61,26 +68,6 @@ export const SettingRow = ({
             color={colors.textTertiary}
           />
         ))}
-    </TouchableOpacity>
+    </XStack>
   );
 };
-
-const styles = StyleSheet.create({
-  row: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: Spacing.lg,
-    paddingVertical: Spacing.md,
-    gap: Spacing.md,
-  },
-  badge: {
-    width: 34,
-    height: 34,
-    borderRadius: 8,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  content: { flex: 1, gap: 2 },
-  label: { ...Typography.bodyMD, fontWeight: "500" },
-  sublabel: { ...Typography.caption },
-});

@@ -1,13 +1,7 @@
 import React from "react";
-import {
-  ScrollView,
-  StyleSheet,
-  Switch,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { ScrollView, Switch } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { Text, View, XStack, YStack } from "tamagui";
 
 import { useColors } from "@context/providers/themeStore";
 import { type BiometricInfo } from "@features/auth/store/authStore";
@@ -57,21 +51,36 @@ export const SettingsView = ({
 
   return (
     <SafeAreaView
-      style={[styles.container, { backgroundColor: colors.background }]}
+      style={{ flex: 1, backgroundColor: colors.background }}
       edges={["top"]}
     >
       <LoadingOverlay visible={isLoading} message={loadingMsg} />
-      <View style={styles.header}>
-        <TouchableOpacity onPress={onBack} activeOpacity={0.7}>
+      <XStack
+        alignItems="center"
+        justifyContent="space-between"
+        paddingHorizontal={Spacing.lg}
+        paddingVertical={Spacing.md}
+      >
+        <XStack onPress={onBack} pressStyle={{ opacity: 0.7 }}>
           <BxIcon name="bx-chevron-left" size={26} color={colors.textPrimary} />
-        </TouchableOpacity>
-        <Text style={[styles.title, { color: colors.textPrimary }]}>
+        </XStack>
+        <Text
+          fontSize={20}
+          fontWeight="600"
+          letterSpacing={-0.3}
+          color={colors.textPrimary}
+        >
           Settings
         </Text>
-        <View style={{ width: 26 }} />
-      </View>
+        <View width={26} />
+      </XStack>
+
       <ScrollView
-        contentContainerStyle={styles.content}
+        contentContainerStyle={{
+          padding: Spacing.lg,
+          paddingBottom: 60,
+          gap: Spacing.xl,
+        }}
         showsVerticalScrollIndicator={false}
       >
         <SectionGroup title="Appearance">
@@ -89,6 +98,7 @@ export const SettingsView = ({
             }
           />
         </SectionGroup>
+
         <SectionGroup title="Security">
           <SettingRow
             icon="bx-hash"
@@ -133,6 +143,7 @@ export const SettingsView = ({
             onPress={onLockVault}
           />
         </SectionGroup>
+
         <SectionGroup title="Data">
           <SettingRow
             icon="bx-tag"
@@ -141,6 +152,7 @@ export const SettingsView = ({
             onPress={onCategories}
           />
         </SectionGroup>
+
         <SectionGroup title="About">
           <SettingRow
             icon="bx-file-blank"
@@ -162,6 +174,7 @@ export const SettingsView = ({
             rightElement={<View />}
           />
         </SectionGroup>
+
         <SectionGroup title="Danger Zone">
           <SettingRow
             icon="bx-trash-alt"
@@ -175,16 +188,3 @@ export const SettingsView = ({
     </SafeAreaView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: { flex: 1 },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: Spacing.lg,
-    paddingVertical: Spacing.md,
-  },
-  title: { fontSize: 20, fontWeight: "600", letterSpacing: -0.3 },
-  content: { padding: Spacing.lg, paddingBottom: 60, gap: Spacing.xl },
-});

@@ -1,18 +1,12 @@
 import React from "react";
-import {
-  FlatList,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { FlatList, TextInput as RNTextInput } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { Text, View, XStack, YStack } from "tamagui";
 
 import { useColors } from "@context/providers/themeStore";
 import { BxIcon } from "@shared/components/BxIcon";
 import { ScreenHeader } from "@shared/components/ScreenHeader";
-import { Radius, Spacing, Typography } from "@shared/constants/design";
+import { Radius, Spacing } from "@shared/constants/design";
 
 interface Category {
   id: string;
@@ -51,16 +45,30 @@ export const CategoriesView = ({
   const colors = useColors();
   return (
     <SafeAreaView
-      style={[styles.container, { backgroundColor: colors.background }]}
+      style={{ flex: 1, backgroundColor: colors.background }}
       edges={["top"]}
     >
       <ScreenHeader title="Categories" onBack={onBack} />
-      <View style={[styles.addRow, { borderBottomColor: colors.border }]}>
-        <TextInput
-          style={[
-            styles.addInput,
-            { color: colors.textPrimary, borderColor: colors.border },
-          ]}
+
+      <XStack
+        alignItems="center"
+        gap={Spacing.sm}
+        paddingHorizontal={Spacing.lg}
+        paddingVertical={Spacing.md}
+        borderBottomWidth={1}
+        borderBottomColor={colors.border}
+      >
+        <RNTextInput
+          style={{
+            flex: 1,
+            fontSize: 16,
+            paddingVertical: Spacing.sm,
+            borderWidth: 1,
+            borderRadius: Radius.md,
+            paddingHorizontal: Spacing.md,
+            color: colors.textPrimary,
+            borderColor: colors.border,
+          }}
           placeholder="New category name…"
           placeholderTextColor={colors.textTertiary}
           value={newName}
@@ -69,40 +77,52 @@ export const CategoriesView = ({
           returnKeyType="done"
           onSubmitEditing={onAdd}
         />
-        <TouchableOpacity
+        <XStack
           onPress={onAdd}
-          activeOpacity={0.7}
-          style={[styles.addBtn, { backgroundColor: colors.accent }]}
+          width={44}
+          height={44}
+          borderRadius={Radius.md}
+          backgroundColor={colors.accent}
+          alignItems="center"
+          justifyContent="center"
+          pressStyle={{ opacity: 0.7 }}
         >
           <BxIcon name="bx-plus" size={22} color={colors.accentForeground} />
-        </TouchableOpacity>
-      </View>
+        </XStack>
+      </XStack>
+
       <FlatList
         data={categories}
         keyExtractor={(item) => item.id}
-        contentContainerStyle={styles.list}
+        contentContainerStyle={{ paddingBottom: 60 }}
         showsVerticalScrollIndicator={false}
         ItemSeparatorComponent={() => (
-          <View style={[styles.sep, { backgroundColor: colors.border }]} />
+          <View height={1} backgroundColor={colors.border} />
         )}
         renderItem={({ item }) => (
-          <View style={[styles.row, { backgroundColor: colors.surface }]}>
-            <View style={styles.rowLeft}>
+          <XStack
+            alignItems="center"
+            paddingHorizontal={Spacing.lg}
+            paddingVertical={Spacing.md}
+            backgroundColor={colors.surface}
+          >
+            <XStack flex={1} alignItems="center" gap={Spacing.md}>
               <View
-                style={[
-                  styles.dot,
-                  { backgroundColor: item.color ?? colors.textTertiary },
-                ]}
+                width={10}
+                height={10}
+                borderRadius={5}
+                backgroundColor={item.color ?? colors.textTertiary}
               />
               {editingId === item.id ? (
-                <TextInput
-                  style={[
-                    styles.editInput,
-                    {
-                      color: colors.textPrimary,
-                      borderBottomColor: colors.border,
-                    },
-                  ]}
+                <RNTextInput
+                  style={{
+                    flex: 1,
+                    fontSize: 15,
+                    borderBottomWidth: 1,
+                    borderBottomColor: colors.border,
+                    paddingVertical: 2,
+                    color: colors.textPrimary,
+                  }}
                   value={editValue}
                   onChangeText={onEditValueChange}
                   autoFocus
@@ -111,35 +131,36 @@ export const CategoriesView = ({
                   onBlur={onSaveEdit}
                 />
               ) : (
-                <Text style={[styles.name, { color: colors.textPrimary }]}>
+                <Text fontSize={15} fontWeight="500" color={colors.textPrimary}>
                   {item.name}
                 </Text>
               )}
               {item.isDefault && (
-                <View
-                  style={[
-                    styles.badge,
-                    { backgroundColor: colors.surfaceSecondary },
-                  ]}
+                <XStack
+                  paddingHorizontal={6}
+                  paddingVertical={2}
+                  borderRadius={4}
+                  backgroundColor={colors.surfaceSecondary}
                 >
                   <Text
-                    style={[styles.badgeText, { color: colors.textTertiary }]}
+                    fontSize={9}
+                    fontWeight="500"
+                    color={colors.textTertiary}
                   >
                     DEFAULT
                   </Text>
-                </View>
+                </XStack>
               )}
-            </View>
-            <View style={styles.actions}>
+            </XStack>
+            <XStack gap={Spacing.md} alignItems="center">
               {editingId === item.id ? (
-                <TouchableOpacity onPress={onSaveEdit} activeOpacity={0.7}>
+                <XStack onPress={onSaveEdit} pressStyle={{ opacity: 0.7 }}>
                   <BxIcon name="bx-check" size={20} color={colors.success} />
-                </TouchableOpacity>
+                </XStack>
               ) : (
-                <TouchableOpacity
+                <XStack
                   onPress={() => onStartEdit(item.id, item.name)}
-                  activeOpacity={0.7}
-                  disabled={item.isDefault}
+                  pressStyle={{ opacity: 0.7 }}
                 >
                   <BxIcon
                     name="bx-edit"
@@ -150,74 +171,22 @@ export const CategoriesView = ({
                         : colors.textSecondary
                     }
                   />
-                </TouchableOpacity>
+                </XStack>
               )}
-              <TouchableOpacity
+              <XStack
                 onPress={() => onDelete(item.id, item.name, item.isDefault)}
-                activeOpacity={0.7}
+                pressStyle={{ opacity: 0.7 }}
               >
                 <BxIcon
                   name="bx-trash"
                   size={18}
                   color={item.isDefault ? colors.textTertiary : colors.error}
                 />
-              </TouchableOpacity>
-            </View>
-          </View>
+              </XStack>
+            </XStack>
+          </XStack>
         )}
       />
     </SafeAreaView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: { flex: 1 },
-  addRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: Spacing.sm,
-    paddingHorizontal: Spacing.lg,
-    paddingVertical: Spacing.md,
-    borderBottomWidth: 1,
-  },
-  addInput: {
-    flex: 1,
-    fontSize: 16,
-    paddingVertical: Spacing.sm,
-    borderWidth: 1,
-    borderRadius: Radius.md,
-    paddingHorizontal: Spacing.md,
-  },
-  addBtn: {
-    width: 44,
-    height: 44,
-    borderRadius: Radius.md,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  list: { paddingBottom: 60 },
-  row: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: Spacing.lg,
-    paddingVertical: Spacing.md,
-  },
-  rowLeft: {
-    flex: 1,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: Spacing.md,
-  },
-  dot: { width: 10, height: 10, borderRadius: 5 },
-  name: { ...Typography.bodyMD, fontWeight: "500" },
-  editInput: {
-    flex: 1,
-    fontSize: 15,
-    borderBottomWidth: 1,
-    paddingVertical: 2,
-  },
-  badge: { paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4 },
-  badgeText: { ...Typography.labelSM, fontSize: 9 },
-  actions: { flexDirection: "row", gap: Spacing.md, alignItems: "center" },
-  sep: { height: 1 },
-});

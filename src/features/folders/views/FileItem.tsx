@@ -1,9 +1,9 @@
 import React from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Text, XStack, YStack } from "tamagui";
 
 import { useColors } from "@context/providers/themeStore";
 import { BxIcon } from "@shared/components/BxIcon";
-import { Radius, Spacing, Typography } from "@shared/constants/design";
+import { Spacing } from "@shared/constants/design";
 import type { NkryptFile } from "@shared/types";
 
 interface FileItemProps {
@@ -15,50 +15,38 @@ interface FileItemProps {
 export const FileItem = ({ file, onPress, onDelete }: FileItemProps) => {
   const colors = useColors();
   return (
-    <TouchableOpacity
+    <XStack
       onPress={onPress}
-      activeOpacity={0.7}
-      style={[
-        styles.item,
-        { backgroundColor: colors.surface, borderColor: colors.border },
-      ]}
+      alignItems="center"
+      padding={Spacing.lg}
+      pressStyle={{ opacity: 0.7 }}
     >
-      <View style={styles.content}>
-        <Text style={[styles.name, { color: colors.textPrimary }]}>
+      <YStack flex={1} gap={4}>
+        <Text
+          fontSize={20}
+          fontWeight="600"
+          letterSpacing={-0.2}
+          color={colors.textPrimary}
+        >
           {file.site}
         </Text>
-        <Text style={[styles.user, { color: colors.textTertiary }]}>
-          {file.username}
+        <Text fontSize={13} color={colors.textTertiary}>
+          ••••••
         </Text>
-      </View>
-      <TouchableOpacity
+      </YStack>
+      <XStack
         onPress={onDelete}
-        activeOpacity={0.7}
+        width={32}
+        height={32}
+        borderRadius={16}
+        backgroundColor={colors.surfaceSecondary}
+        alignItems="center"
+        justifyContent="center"
+        pressStyle={{ opacity: 0.7 }}
         hitSlop={8}
-        style={[styles.deleteBtn, { backgroundColor: colors.surfaceSecondary }]}
       >
         <BxIcon name="bx-trash" size={16} color={colors.textTertiary} />
-      </TouchableOpacity>
-    </TouchableOpacity>
+      </XStack>
+    </XStack>
   );
 };
-
-const styles = StyleSheet.create({
-  item: {
-    flexDirection: "row",
-    alignItems: "center",
-    padding: Spacing.lg,
-    borderRadius: Radius.lg,
-    borderWidth: 1,
-  },
-  content: { flex: 1, gap: 4 },
-  name: { fontSize: 16, fontWeight: "600", letterSpacing: -0.2 },
-  user: { ...Typography.bodySM },
-  deleteBtn: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-});

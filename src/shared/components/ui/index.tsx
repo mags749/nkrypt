@@ -1,28 +1,37 @@
 import React, { forwardRef } from "react";
 import {
   ActivityIndicator,
-  StyleSheet,
-  Text,
-  TextInput,
+  TextInput as RNTextInput,
   type TextInputProps,
-  TouchableOpacity,
-  type TouchableOpacityProps,
-  View,
-  type ViewStyle,
 } from "react-native";
+import {
+  Button as TButton,
+  Input,
+  Label,
+  Separator as TSeparator,
+  SizableText,
+  XStack,
+  YStack,
+  styled,
+  Text,
+  View,
+} from "tamagui";
 
 import { useColors } from "@context/providers/themeStore";
 import { Radius, Spacing, Typography } from "@shared/constants/design";
 
 // ─── Button ───────────────────────────────────────────────────────────────────
 
-interface ButtonProps extends TouchableOpacityProps {
+interface ButtonProps {
   label: string;
   variant?: "primary" | "ghost" | "danger";
   size?: "sm" | "md" | "lg";
   loading?: boolean;
   loadingLabel?: string;
   fullWidth?: boolean;
+  onPress?: () => void;
+  disabled?: boolean;
+  style?: any;
 }
 
 export const Button = ({
@@ -32,9 +41,9 @@ export const Button = ({
   loading = false,
   loadingLabel,
   fullWidth = false,
-  style,
+  onPress,
   disabled,
-  ...rest
+  style,
 }: ButtonProps) => {
   const colors = useColors();
 
@@ -44,46 +53,55 @@ export const Button = ({
       : variant === "danger"
         ? colors.error
         : "transparent";
+
   const textColor =
     variant === "primary" || variant === "danger"
       ? colors.accentForeground
       : colors.textPrimary;
+
   const height = size === "lg" ? 54 : size === "md" ? 46 : 38;
 
   return (
-    <TouchableOpacity
-      activeOpacity={0.8}
-      disabled={disabled ?? loading}
-      style={[
-        styles.button,
-        {
-          backgroundColor: bgColor,
-          height,
-          borderRadius: Radius.lg,
-          opacity: disabled && !loading ? 0.45 : 1,
-          width: fullWidth ? "100%" : undefined,
-          borderWidth: variant === "ghost" ? 1 : 0,
-          borderColor: variant === "ghost" ? colors.border : undefined,
-        },
-        style as ViewStyle,
-      ]}
-      {...rest}
+    <XStack
+      onPress={disabled || loading ? undefined : onPress}
+      alignItems="center"
+      justifyContent="center"
+      height={height}
+      borderRadius={Radius.lg}
+      backgroundColor={bgColor}
+      paddingHorizontal={Spacing["2xl"]}
+      opacity={disabled && !loading ? 0.45 : 1}
+      width={fullWidth ? "100%" : undefined}
+      borderWidth={variant === "ghost" ? 1 : 0}
+      borderColor={variant === "ghost" ? colors.border : undefined}
+      pressStyle={{ opacity: 0.75 }}
+      style={style}
     >
       {loading ? (
-        <View style={styles.loadingRow}>
+        <XStack gap={Spacing.sm} alignItems="center">
           <ActivityIndicator color={textColor} size="small" />
           {loadingLabel && (
-            <Text style={[styles.buttonText, { color: textColor }]}>
+            <Text
+              color={textColor}
+              fontSize={12}
+              fontWeight="600"
+              letterSpacing={1.2}
+            >
               {loadingLabel.toUpperCase()}
             </Text>
           )}
-        </View>
+        </XStack>
       ) : (
-        <Text style={[styles.buttonText, { color: textColor }]}>
+        <Text
+          color={textColor}
+          fontSize={12}
+          fontWeight="600"
+          letterSpacing={1.2}
+        >
           {label.toUpperCase()}
         </Text>
       )}
-    </TouchableOpacity>
+    </XStack>
   );
 };
 
@@ -95,23 +113,32 @@ interface InputFieldProps extends TextInputProps {
   hint?: string;
 }
 
-export const InputField = forwardRef<TextInput, InputFieldProps>(
+export const InputField = forwardRef<RNTextInput, InputFieldProps>(
   ({ label, error, hint, style, ...props }, ref) => {
     const colors = useColors();
 
     return (
-      <View style={styles.inputWrapper}>
+      <YStack marginBottom={Spacing.xl}>
         {label && (
-          <Text style={[styles.inputLabel, { color: colors.textTertiary }]}>
+          <Text
+            color={colors.textTertiary}
+            fontSize={11}
+            fontWeight="600"
+            letterSpacing={1.0}
+            marginBottom={Spacing.sm}
+          >
             {label.toUpperCase()}
           </Text>
         )}
-        <TextInput
+        <RNTextInput
           ref={ref}
           style={[
-            styles.input,
             {
               color: colors.textPrimary,
+              fontSize: 17,
+              paddingVertical: Spacing.sm,
+              paddingHorizontal: 0,
+              borderBottomWidth: 1,
               borderBottomColor: error ? colors.error : colors.border,
             },
             style,
@@ -122,15 +149,19 @@ export const InputField = forwardRef<TextInput, InputFieldProps>(
           {...props}
         />
         {error ? (
-          <Text style={[styles.fieldNote, { color: colors.error }]}>
+          <Text color={colors.error} fontSize={12} marginTop={Spacing.xs}>
             {error}
           </Text>
         ) : hint ? (
-          <Text style={[styles.fieldNote, { color: colors.textTertiary }]}>
+          <Text
+            color={colors.textTertiary}
+            fontSize={12}
+            marginTop={Spacing.xs}
+          >
             {hint}
           </Text>
         ) : null}
-      </View>
+      </YStack>
     );
   },
 );
@@ -141,20 +172,22 @@ InputField.displayName = "InputField";
 export const SectionHeader = ({ title }: { title: string }) => {
   const colors = useColors();
   return (
-    <View
-      style={[
-        styles.sectionHeader,
-        {
-          borderBottomColor: colors.surfaceSecondary,
-          borderBottomWidth: 1,
-          paddingBottom: 8,
-        },
-      ]}
+    <XStack
+      paddingHorizontal={Spacing.lg}
+      paddingVertical={Spacing.xs}
+      paddingBottom={8}
+      borderBottomWidth={1}
+      borderBottomColor={colors.surfaceSecondary}
     >
-      <Text style={[styles.sectionHeaderText, { color: colors.textTertiary }]}>
+      <Text
+        color={colors.textTertiary}
+        fontSize={12}
+        fontWeight="600"
+        letterSpacing={1.2}
+      >
         {title.toUpperCase()}
       </Text>
-    </View>
+    </XStack>
   );
 };
 
@@ -162,56 +195,5 @@ export const SectionHeader = ({ title }: { title: string }) => {
 
 export const Separator = () => {
   const colors = useColors();
-  return (
-    <View style={[styles.separator, { backgroundColor: colors.separator }]} />
-  );
+  return <View height={1} backgroundColor={colors.separator} />;
 };
-
-// ─── Styles ───────────────────────────────────────────────────────────────────
-
-const styles = StyleSheet.create({
-  button: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    paddingHorizontal: Spacing["2xl"],
-  },
-  loadingRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: Spacing.sm,
-  },
-  buttonText: {
-    ...Typography.labelLG,
-    fontWeight: "600",
-    letterSpacing: 1.2,
-  },
-  inputWrapper: {
-    marginBottom: Spacing.xl,
-  },
-  inputLabel: {
-    ...Typography.labelMD,
-    marginBottom: Spacing.sm,
-  },
-  input: {
-    ...Typography.bodyLG,
-    paddingVertical: Spacing.sm,
-    paddingHorizontal: 0,
-    borderBottomWidth: 1,
-  },
-  fieldNote: {
-    ...Typography.caption,
-    marginTop: Spacing.xs,
-  },
-  sectionHeader: {
-    paddingHorizontal: Spacing.lg,
-    paddingVertical: Spacing.xs,
-  },
-  sectionHeaderText: {
-    ...Typography.labelLG,
-  },
-  separator: {
-    height: 1,
-    marginHorizontal: Spacing.lg,
-  },
-});

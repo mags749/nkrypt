@@ -1,10 +1,10 @@
 import React from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { Text, YStack } from "tamagui";
 
 import { useColors } from "@context/providers/themeStore";
 import { PassKeyInput } from "@shared/components/PassKeyInput";
 import { WarningBox } from "@shared/components/WarningBox";
-import { Spacing, Typography } from "@shared/constants/design";
+import { Spacing } from "@shared/constants/design";
 
 interface ChangePassKeyNewStepProps {
   newKey: string;
@@ -23,11 +23,16 @@ export const ChangePassKeyNewStep = ({
 }: ChangePassKeyNewStepProps) => {
   const colors = useColors();
   return (
-    <View style={styles.container}>
-      <Text style={[styles.title, { color: colors.textPrimary }]}>
+    <YStack gap={Spacing["2xl"]}>
+      <Text
+        fontSize={26}
+        fontWeight="600"
+        letterSpacing={-0.5}
+        color={colors.textPrimary}
+      >
         New Pass Key
       </Text>
-      <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
+      <Text fontSize={15} color={colors.textSecondary} lineHeight={22}>
         Choose a new 4–6 digit Pass Key. All files will be re-encrypted.
       </Text>
       <WarningBox
@@ -35,46 +40,45 @@ export const ChangePassKeyNewStep = ({
         variant="error"
       />
 
-      <View style={styles.keyBlock}>
-        <Text style={[styles.label, { color: colors.textTertiary }]}>
+      <YStack gap={Spacing.md} alignItems="center">
+        <Text
+          color={colors.textTertiary}
+          fontSize={11}
+          fontWeight="600"
+          letterSpacing={1.2}
+        >
           NEW PASS KEY
         </Text>
         <PassKeyInput value={newKey} onChange={onNewKeyChange} autoFocus />
-        {errors.newKey ? (
-          <Text style={[styles.error, { color: colors.error }]}>
+        {errors.newKey && (
+          <Text color={colors.error} fontSize={12}>
             {errors.newKey}
           </Text>
-        ) : null}
-      </View>
+        )}
+      </YStack>
 
-      <View style={styles.keyBlock}>
-        <Text style={[styles.label, { color: colors.textTertiary }]}>
+      <YStack gap={Spacing.md} alignItems="center">
+        <Text
+          color={colors.textTertiary}
+          fontSize={11}
+          fontWeight="600"
+          letterSpacing={1.2}
+        >
           CONFIRM PASS KEY
         </Text>
         <PassKeyInput value={newKeyConfirm} onChange={onNewKeyConfirmChange} />
-        {errors.newKeyConfirm ? (
-          <Text style={[styles.error, { color: colors.error }]}>
+        {errors.newKeyConfirm && (
+          <Text color={colors.error} fontSize={12}>
             {errors.newKeyConfirm}
           </Text>
-        ) : null}
-      </View>
+        )}
+      </YStack>
 
       {errors.general && (
-        <Text
-          style={[styles.error, { color: colors.error, textAlign: "center" }]}
-        >
+        <Text color={colors.error} fontSize={12} textAlign="center">
           {errors.general}
         </Text>
       )}
-    </View>
+    </YStack>
   );
 };
-
-const styles = StyleSheet.create({
-  container: { gap: Spacing["2xl"] },
-  title: { fontSize: 26, fontWeight: "600", letterSpacing: -0.5 },
-  subtitle: { ...Typography.bodyMD, lineHeight: 22 },
-  label: { ...Typography.labelMD, letterSpacing: 1.2 },
-  keyBlock: { gap: Spacing.md, alignItems: "center" },
-  error: { ...Typography.caption },
-});

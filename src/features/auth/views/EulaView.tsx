@@ -1,17 +1,12 @@
 import React from "react";
-import {
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { Text, View, XStack, YStack } from "tamagui";
 
 import { useColors } from "@context/providers/themeStore";
 import { BxIcon } from "@shared/components/BxIcon";
 import { Button } from "@shared/components/ui";
-import { Radius, Spacing, Typography } from "@shared/constants/design";
+import { Radius, Spacing } from "@shared/constants/design";
 
 const SECTIONS = [
   {
@@ -56,46 +51,71 @@ export const EulaView = ({
   const colors = useColors();
   return (
     <SafeAreaView
-      style={[styles.container, { backgroundColor: colors.background }]}
+      style={{ flex: 1, backgroundColor: colors.background }}
       edges={["top", "bottom"]}
     >
-      <View style={styles.header}>
-        <Text style={[styles.title, { color: colors.textPrimary }]}>
+      <YStack
+        paddingHorizontal={Spacing["2xl"]}
+        paddingTop={Spacing["3xl"]}
+        paddingBottom={Spacing.lg}
+        gap={Spacing.xs}
+      >
+        <Text
+          fontSize={28}
+          fontWeight="700"
+          letterSpacing={-0.5}
+          color={colors.textPrimary}
+        >
           Terms of Use
         </Text>
-        <Text style={[styles.sub, { color: colors.textTertiary }]}>
+        <Text fontSize={15} color={colors.textTertiary}>
           Please read and accept before continuing
         </Text>
-      </View>
+      </YStack>
+
       <ScrollView
-        style={styles.scroll}
-        contentContainerStyle={styles.scrollContent}
+        style={{ flex: 1 }}
+        contentContainerStyle={{
+          paddingHorizontal: Spacing["2xl"],
+          paddingBottom: Spacing["2xl"],
+          gap: Spacing.xl,
+        }}
         showsVerticalScrollIndicator={false}
       >
         {SECTIONS.map((s) => (
-          <View key={s.title} style={styles.section}>
-            <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>
+          <YStack key={s.title} gap={Spacing.xs}>
+            <Text fontSize={15} fontWeight="600" color={colors.textPrimary}>
               {s.title}
             </Text>
-            <Text style={[styles.sectionBody, { color: colors.textSecondary }]}>
+            <Text fontSize={15} color={colors.textSecondary} lineHeight={22}>
               {s.body}
             </Text>
-          </View>
+          </YStack>
         ))}
-        <View style={[styles.divider, { backgroundColor: colors.border }]} />
-        <TouchableOpacity
-          style={styles.agreeRow}
+
+        <View
+          height={1}
+          backgroundColor={colors.border}
+          marginVertical={Spacing.sm}
+        />
+
+        <XStack
           onPress={onToggleAgreed}
-          activeOpacity={0.7}
+          alignItems="flex-start"
+          gap={Spacing.md}
+          pressStyle={{ opacity: 0.7 }}
         >
-          <View
-            style={[
-              styles.checkbox,
-              {
-                borderColor: agreed ? colors.accent : colors.border,
-                backgroundColor: agreed ? colors.accent : "transparent",
-              },
-            ]}
+          <XStack
+            width={22}
+            height={22}
+            borderRadius={Radius.sm}
+            borderWidth={1.5}
+            borderColor={agreed ? colors.accent : colors.border}
+            backgroundColor={agreed ? colors.accent : "transparent"}
+            alignItems="center"
+            justifyContent="center"
+            marginTop={2}
+            flexShrink={0}
           >
             {agreed && (
               <BxIcon
@@ -104,13 +124,23 @@ export const EulaView = ({
                 color={colors.accentForeground}
               />
             )}
-          </View>
-          <Text style={[styles.agreeText, { color: colors.textPrimary }]}>
+          </XStack>
+          <Text
+            flex={1}
+            fontSize={15}
+            color={colors.textPrimary}
+            lineHeight={22}
+          >
             I have read and agree to the Terms of Use
           </Text>
-        </TouchableOpacity>
+        </XStack>
       </ScrollView>
-      <View style={[styles.footer, { backgroundColor: colors.background }]}>
+
+      <YStack
+        padding={Spacing["2xl"]}
+        paddingTop={Spacing.sm}
+        backgroundColor={colors.background}
+      >
         <Button
           label="Accept & Continue"
           onPress={onAccept}
@@ -118,42 +148,7 @@ export const EulaView = ({
           disabled={!agreed}
           fullWidth
         />
-      </View>
+      </YStack>
     </SafeAreaView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: { flex: 1 },
-  header: {
-    paddingHorizontal: Spacing["2xl"],
-    paddingTop: Spacing["3xl"],
-    paddingBottom: Spacing.lg,
-    gap: Spacing.xs,
-  },
-  title: { fontSize: 28, fontWeight: "700", letterSpacing: -0.5 },
-  sub: { ...Typography.bodyMD },
-  scroll: { flex: 1 },
-  scrollContent: {
-    paddingHorizontal: Spacing["2xl"],
-    paddingBottom: Spacing["2xl"],
-    gap: Spacing.xl,
-  },
-  section: { gap: Spacing.xs },
-  sectionTitle: { fontSize: 15, fontWeight: "600" },
-  sectionBody: { ...Typography.bodyMD, lineHeight: 22 },
-  divider: { height: 1, marginVertical: Spacing.sm },
-  agreeRow: { flexDirection: "row", alignItems: "flex-start", gap: Spacing.md },
-  checkbox: {
-    width: 22,
-    height: 22,
-    borderRadius: Radius.sm,
-    borderWidth: 1.5,
-    alignItems: "center",
-    justifyContent: "center",
-    marginTop: 2,
-    flexShrink: 0,
-  },
-  agreeText: { ...Typography.bodyMD, flex: 1, lineHeight: 22 },
-  footer: { padding: Spacing["2xl"], paddingTop: Spacing.sm },
-});

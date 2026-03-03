@@ -2,7 +2,10 @@ import { useState } from "react";
 import { useRouter } from "expo-router";
 import { useAuthStore } from "@features/auth/store/authStore";
 import { reEncryptAllFiles } from "@features/files/store/filesStore";
-import { PASSKEY_MIN_LENGTH, PASSKEY_MAX_VALUE } from "@shared/components/PassKeyInput";
+import {
+  PASSKEY_MIN_LENGTH,
+  PASSKEY_MAX_VALUE,
+} from "@shared/components/PassKeyInput";
 
 export const useChangePassKey = () => {
   const router = useRouter();

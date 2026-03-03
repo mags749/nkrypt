@@ -1,12 +1,7 @@
 import React from "react";
-import {
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { Text, View, XStack } from "tamagui";
 
 import { useColors } from "@context/providers/themeStore";
 import { BxIcon } from "@shared/components/BxIcon";
@@ -20,11 +15,15 @@ interface FileDetailViewProps {
   folderName: string;
   credentialsRevealed: boolean;
   decryptedCredentials: string | null;
+  usernameRevealed: boolean;
+  decryptedUsername: string | null;
   onBack: () => void;
   onEdit: () => void;
   onNewFile: () => void;
   onReveal: () => void;
+  onRevealUsername: () => void;
   onCopyCredentials: () => void;
+  onCopyUsername: () => void;
   onCopyField: (value: string) => void;
 }
 
@@ -33,35 +32,49 @@ export const FileDetailView = ({
   folderName,
   credentialsRevealed,
   decryptedCredentials,
+  usernameRevealed,
+  decryptedUsername,
   onBack,
   onEdit,
   onNewFile,
   onReveal,
+  onRevealUsername,
   onCopyCredentials,
+  onCopyUsername,
   onCopyField,
 }: FileDetailViewProps) => {
   const colors = useColors();
   return (
     <SafeAreaView
-      style={[styles.container, { backgroundColor: colors.background }]}
+      style={{ flex: 1, backgroundColor: colors.background }}
       edges={["top"]}
     >
-      <View style={styles.header}>
-        <TouchableOpacity onPress={onBack} activeOpacity={0.7}>
+      <XStack
+        alignItems="center"
+        justifyContent="space-between"
+        paddingHorizontal={Spacing.lg}
+        paddingVertical={Spacing.md}
+        gap={Spacing.md}
+      >
+        <XStack onPress={onBack} pressStyle={{ opacity: 0.7 }}>
           <BxIcon name="bx-chevron-left" size={26} color={colors.textPrimary} />
-        </TouchableOpacity>
+        </XStack>
         <Text
-          style={[styles.title, { color: colors.textPrimary }]}
+          fontSize={20}
+          fontWeight="600"
+          letterSpacing={-0.3}
+          color={colors.textPrimary}
           numberOfLines={1}
         >
           {file.site}
         </Text>
-        <TouchableOpacity onPress={onEdit} activeOpacity={0.7}>
+        <XStack onPress={onEdit} pressStyle={{ opacity: 0.7 }}>
           <BxIcon name="bx-edit" size={20} color={colors.textPrimary} />
-        </TouchableOpacity>
-      </View>
+        </XStack>
+      </XStack>
+
       <ScrollView
-        contentContainerStyle={styles.content}
+        contentContainerStyle={{ padding: Spacing["2xl"], paddingBottom: 120 }}
         showsVerticalScrollIndicator={false}
       >
         <FieldRow
@@ -70,13 +83,18 @@ export const FileDetailView = ({
           onCopy={() => onCopyField(file.site)}
           onOpen={() => {}}
         />
-        <View style={[styles.divider, { backgroundColor: colors.separator }]} />
+        <View height={1} backgroundColor={colors.separator} />
+
         <FieldRow
           label="Username"
-          value={file.username}
-          onCopy={() => onCopyField(file.username)}
+          value={usernameRevealed ? (decryptedUsername ?? "") : ""}
+          masked
+          revealed={usernameRevealed}
+          onReveal={onRevealUsername}
+          onCopy={onCopyUsername}
         />
-        <View style={[styles.divider, { backgroundColor: colors.separator }]} />
+        <View height={1} backgroundColor={colors.separator} />
+
         <FieldRow
           label="Credentials"
           value={decryptedCredentials ?? ""}
@@ -91,37 +109,23 @@ export const FileDetailView = ({
           folderName={folderName}
         />
       </ScrollView>
-      <TouchableOpacity
-        style={[styles.fab, { backgroundColor: colors.accent }, Shadow.lg]}
+
+      <XStack
         onPress={onNewFile}
-        activeOpacity={0.85}
+        position="absolute"
+        bottom={Spacing["3xl"]}
+        right={Spacing["2xl"]}
+        width={56}
+        height={56}
+        borderRadius={28}
+        backgroundColor={colors.accent}
+        alignItems="center"
+        justifyContent="center"
+        pressStyle={{ opacity: 0.85 }}
+        style={Shadow.lg}
       >
         <BxIcon name="bx-plus" size={26} color={colors.accentForeground} />
-      </TouchableOpacity>
+      </XStack>
     </SafeAreaView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: { flex: 1 },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: Spacing.lg,
-    paddingVertical: Spacing.md,
-    gap: Spacing.md,
-  },
-  title: { flex: 1, fontSize: 20, fontWeight: "600", letterSpacing: -0.3 },
-  content: { padding: Spacing["2xl"], paddingBottom: 120 },
-  divider: { height: 1 },
-  fab: {
-    position: "absolute",
-    bottom: Spacing["3xl"],
-    right: Spacing["2xl"],
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-});

@@ -1,14 +1,14 @@
 import React from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Text, View, XStack, YStack } from "tamagui";
 
 import { useColors } from "@context/providers/themeStore";
 import { BlurModal } from "@shared/components/BlurModal";
 import { PassKeyInput } from "@shared/components/PassKeyInput";
 import { Button } from "@shared/components/ui";
-import { Spacing, Typography } from "@shared/constants/design";
+import { Spacing } from "@shared/constants/design";
 
 interface PassKeyPromptViewProps {
-  mode?: "copy" | "reveal";
+  mode?: "copy" | "reveal" | "copy-username";
   passKey: string;
   onPassKeyChange: (v: string) => void;
   error: string | null;
@@ -27,39 +27,56 @@ export const PassKeyPromptView = ({
   onDismiss,
 }: PassKeyPromptViewProps) => {
   const colors = useColors();
-  const modeLabel = mode === "copy" ? "Copy" : "Reveal";
+  const modeLabel =
+    mode === "copy" || mode === "copy-username" ? "Copy" : "Reveal";
+  const subtitle =
+    mode === "copy"
+      ? "Enter your Pass Key to copy the credentials."
+      : mode === "copy-username"
+        ? "Enter your Pass Key to copy the username."
+        : "Enter your Pass Key to reveal the credentials.";
+
   return (
     <BlurModal visible onDismiss={onDismiss} position="flex-end">
-      <View style={styles.titleBlock}>
-        <Text style={[styles.title, { color: colors.textPrimary }]}>
+      <YStack gap={Spacing.xs} marginBottom={Spacing["2xl"]}>
+        <Text
+          fontSize={22}
+          fontWeight="700"
+          letterSpacing={-0.3}
+          color={colors.textPrimary}
+        >
           Verify Pass Key
         </Text>
-        <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
-          {mode === "copy"
-            ? "Enter your Pass Key to copy the credentials."
-            : "Enter your Pass Key to reveal the credentials."}
+        <Text fontSize={15} color={colors.textSecondary}>
+          {subtitle}
         </Text>
-      </View>
+      </YStack>
 
-      <View style={styles.inputWrapper}>
-        <PassKeyInput
-          value={passKey}
-          onChange={onPassKeyChange}
-          autoFocus
-        />
-        {error ? (
-          <Text style={[styles.errorText, { color: colors.error }]}>
+      <YStack alignItems="center" marginBottom={Spacing.lg} gap={Spacing.sm}>
+        <PassKeyInput value={passKey} onChange={onPassKeyChange} autoFocus />
+        {error && (
+          <Text color={colors.error} fontSize={12} textAlign="center">
             {error}
           </Text>
-        ) : null}
-      </View>
+        )}
+      </YStack>
 
-      <View style={styles.actions}>
-        <TouchableOpacity onPress={onDismiss} activeOpacity={0.7}>
-          <Text style={[styles.cancel, { color: colors.textSecondary }]}>
+      <XStack
+        alignItems="center"
+        justifyContent="flex-end"
+        gap={Spacing.lg}
+        marginTop={Spacing.sm}
+      >
+        <XStack onPress={onDismiss} pressStyle={{ opacity: 0.7 }}>
+          <Text
+            color={colors.textSecondary}
+            fontSize={12}
+            fontWeight="600"
+            letterSpacing={1.5}
+          >
             CANCEL
           </Text>
-        </TouchableOpacity>
+        </XStack>
         <Button
           label={modeLabel}
           onPress={onConfirm}
@@ -67,27 +84,7 @@ export const PassKeyPromptView = ({
           loadingLabel="Decrypting…"
           size="md"
         />
-      </View>
+      </XStack>
     </BlurModal>
   );
 };
-
-const styles = StyleSheet.create({
-  titleBlock: { gap: Spacing.xs, marginBottom: Spacing["2xl"] },
-  title: { fontSize: 22, fontWeight: "700", letterSpacing: -0.3 },
-  subtitle: { ...Typography.bodyMD },
-  inputWrapper: {
-    alignItems: "center",
-    marginBottom: Spacing.lg,
-    gap: Spacing.sm,
-  },
-  errorText: { ...Typography.caption, textAlign: "center" },
-  actions: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "flex-end",
-    gap: Spacing.lg,
-    marginTop: Spacing.sm,
-  },
-  cancel: { ...Typography.labelLG, letterSpacing: 1.5 },
-});

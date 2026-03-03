@@ -13,9 +13,7 @@
       "resizeMode": "contain",
       "backgroundColor": "#09090B"
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "io.nkrypt.starter",
@@ -24,6 +22,7 @@
       }
     },
     "android": {
+      "softwareKeyboardLayoutMode": "adjustResize",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#09090B"

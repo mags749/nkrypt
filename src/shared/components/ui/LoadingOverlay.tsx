@@ -1,17 +1,9 @@
 import React, { useEffect, useRef } from "react";
-import {
-  ActivityIndicator,
-  Animated,
-  Modal,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
+import { ActivityIndicator, Animated, Modal } from "react-native";
+import { Text, View, XStack, YStack } from "tamagui";
 
 import { useColors } from "@context/providers/themeStore";
-import { Radius, Shadow, Spacing, Typography } from "@shared/constants/design";
-
-// ─── LoadingOverlay ───────────────────────────────────────────────────────────
+import { Radius, Shadow, Spacing } from "@shared/constants/design";
 
 interface LoadingOverlayProps {
   visible: boolean;
@@ -59,19 +51,30 @@ export const LoadingOverlay = ({
       visible={visible}
       statusBarTranslucent
     >
-      <Animated.View style={[styles.overlay, { opacity: fadeAnim }]}>
+      <Animated.View
+        style={{
+          flex: 1,
+          backgroundColor: "rgba(0,0,0,0.45)",
+          alignItems: "center",
+          justifyContent: "center",
+          opacity: fadeAnim,
+        }}
+      >
         <Animated.View
-          style={[
-            styles.card,
-            {
-              backgroundColor: colors.surface,
-              ...Shadow.xl,
-              transform: [{ scale: scaleAnim }],
-            },
-          ]}
+          style={{
+            borderRadius: Radius.xl,
+            paddingVertical: Spacing["3xl"],
+            paddingHorizontal: Spacing["4xl"],
+            alignItems: "center",
+            gap: Spacing.lg,
+            minWidth: 160,
+            backgroundColor: colors.surface,
+            ...Shadow.xl,
+            transform: [{ scale: scaleAnim }],
+          }}
         >
           <ActivityIndicator size="large" color={colors.textPrimary} />
-          <Text style={[styles.message, { color: colors.textSecondary }]}>
+          <Text color={colors.textSecondary} fontSize={15} textAlign="center">
             {message}
           </Text>
         </Animated.View>
@@ -80,28 +83,6 @@ export const LoadingOverlay = ({
   );
 };
 
-// ─── InlineSpinner ────────────────────────────────────────────────────────────
-
 export const InlineSpinner = ({ color }: { color: string }) => (
   <ActivityIndicator size="small" color={color} />
 );
-
-// ─── Styles ───────────────────────────────────────────────────────────────────
-
-const styles = StyleSheet.create({
-  overlay: {
-    flex: 1,
-    backgroundColor: "rgba(0,0,0,0.45)",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  card: {
-    borderRadius: Radius.xl,
-    paddingVertical: Spacing["3xl"],
-    paddingHorizontal: Spacing["4xl"],
-    alignItems: "center",
-    gap: Spacing.lg,
-    minWidth: 160,
-  },
-  message: { ...Typography.bodyMD, textAlign: "center" },
-});

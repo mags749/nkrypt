@@ -1,16 +1,11 @@
 import React from "react";
-import {
-  Animated,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { Animated } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Svg, { Polygon } from "react-native-svg";
+import { Text, XStack, YStack } from "tamagui";
 
 import { useColors } from "@context/providers/themeStore";
-import { Spacing, Typography } from "@shared/constants/design";
+import { Spacing } from "@shared/constants/design";
 
 interface RingProps {
   size: number;
@@ -81,17 +76,21 @@ export const SplashView = ({
   const SIZE = 200;
   return (
     <SafeAreaView
-      style={[styles.container, { backgroundColor: colors.background }]}
+      style={{
+        flex: 1,
+        backgroundColor: colors.background,
+        justifyContent: "space-between",
+        alignItems: "center",
+        paddingVertical: Spacing["3xl"],
+      }}
       edges={["top", "bottom"]}
     >
-      <View style={styles.center}>
-        <View
-          style={{
-            width: SIZE,
-            height: SIZE,
-            alignItems: "center",
-            justifyContent: "center",
-          }}
+      <YStack flex={1} justifyContent="center" alignItems="center">
+        <XStack
+          width={SIZE}
+          height={SIZE}
+          alignItems="center"
+          justifyContent="center"
         >
           <Ring
             size={SIZE}
@@ -117,42 +116,45 @@ export const SplashView = ({
             rotation={rot2}
             opacity={0.3}
           />
-        </View>
-        <Animated.View style={[styles.textBlock, { opacity: fadeAnim }]}>
-          <Text style={[styles.brand, { color: colors.textPrimary }]}>
+        </XStack>
+        <Animated.View
+          style={{
+            alignItems: "center",
+            marginTop: Spacing["3xl"],
+            gap: Spacing.sm,
+            opacity: fadeAnim,
+          }}
+        >
+          <Text
+            fontSize={36}
+            fontWeight="300"
+            letterSpacing={8}
+            color={colors.textPrimary}
+          >
             nkrypt
           </Text>
-          <Text style={[styles.tagline, { color: colors.textTertiary }]}>
+          <Text
+            fontSize={11}
+            fontWeight="600"
+            letterSpacing={4}
+            color={colors.textTertiary}
+          >
             SECURE ENCRYPTION
           </Text>
         </Animated.View>
-      </View>
-      <Animated.View style={[styles.footer, { opacity: fadeAnim }]}>
-        <TouchableOpacity onPress={onToggleTheme} activeOpacity={0.6}>
-          <Text style={[styles.toggle, { color: colors.textTertiary }]}>
+      </YStack>
+      <Animated.View style={{ paddingBottom: Spacing.xl, opacity: fadeAnim }}>
+        <XStack onPress={onToggleTheme} pressStyle={{ opacity: 0.6 }}>
+          <Text
+            fontSize={11}
+            fontWeight="600"
+            letterSpacing={2}
+            color={colors.textTertiary}
+          >
             TOGGLE APPEARANCE
           </Text>
-        </TouchableOpacity>
+        </XStack>
       </Animated.View>
     </SafeAreaView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingVertical: Spacing["3xl"],
-  },
-  center: { flex: 1, justifyContent: "center", alignItems: "center" },
-  textBlock: {
-    alignItems: "center",
-    marginTop: Spacing["3xl"],
-    gap: Spacing.sm,
-  },
-  brand: { fontSize: 36, fontWeight: "300", letterSpacing: 8 },
-  tagline: { ...Typography.labelMD, letterSpacing: 4 },
-  footer: { paddingBottom: Spacing.xl },
-  toggle: { ...Typography.labelMD, letterSpacing: 2 },
-});

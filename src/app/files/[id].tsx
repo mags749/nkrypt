@@ -12,11 +12,15 @@ export default function FileDetailScreen() {
       folderName={hook.folder?.name ?? "—"}
       credentialsRevealed={hook.credentialsRevealed}
       decryptedCredentials={hook.decryptedCredentials}
+      usernameRevealed={hook.usernameRevealed}
+      decryptedUsername={hook.decryptedUsername}
       onBack={hook.onBack}
       onEdit={hook.onEdit}
       onNewFile={hook.onNewFile}
       onReveal={hook.onReveal}
+      onRevealUsername={hook.onRevealUsername}
       onCopyCredentials={hook.onCopyCredentials}
+      onCopyUsername={hook.onCopyUsername}
       onCopyField={hook.onCopyField}
     />
   );

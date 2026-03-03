@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Alert } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useFilesStore } from "@features/files/store/filesStore";
@@ -10,6 +10,8 @@ export const useFolderDetail = () => {
   const folder = useFoldersStore((s) => s.getFolderById(id));
   const { filesByFolder, loadFilesForFolder, deleteFile } = useFilesStore();
   const files = filesByFolder[id] ?? [];
+  const [openMoreOptionSheet, setMoreOptionVisibility] =
+    useState<boolean>(false);
 
   useEffect(() => {
     if (id) void loadFilesForFolder(id);
@@ -71,12 +73,19 @@ export const useFolderDetail = () => {
     id,
     onFilePress,
     onDeleteFile,
-    onMoreOptions,
+    openMoreOptionSheet,
+    onMoreOptions: (value: boolean) => setMoreOptionVisibility(value),
     onBack: () => router.back(),
     onNewFile: () =>
       router.push({
         pathname: "/modals/create-file",
         params: { folderId: id },
       }),
+    onEditFolder: () =>
+      router.push({
+        pathname: "/modals/create-folder",
+        params: { editId: id },
+      }),
+    onDeleteFolder: () => {},
   };
 };

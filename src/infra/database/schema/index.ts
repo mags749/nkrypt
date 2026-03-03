@@ -31,7 +31,8 @@ export const files = sqliteTable("files", {
     .notNull()
     .references(() => folders.id, { onDelete: "cascade" }),
   site: text("site").notNull(),
-  username: text("username").notNull(),
+  username: text("username").notNull().default(""), // kept for legacy rows; use encryptedUsername going forward
+  encryptedUsername: text("encrypted_username").notNull().default(""), // AES-256-CTR hex
   encryptedCredentials: text("encrypted_credentials").notNull(), // AES-256-CTR hex
   createdAt: integer("created_at", { mode: "timestamp_ms" }).notNull(),
   updatedAt: integer("updated_at", { mode: "timestamp_ms" }).notNull(),

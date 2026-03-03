@@ -19,6 +19,15 @@ module.exports = function (api) {
       ],
       'react-native-reanimated/plugin',
       ["inline-import", { extensions: [".sql"] }],
+      [
+        '@tamagui/babel-plugin',
+        {
+          components: ['tamagui'],
+          config: './tamagui.config.ts',
+          logTimings: false,
+          disableExtraction: process.env.NODE_ENV === 'development',
+        },
+      ],
     ],
   };
 };

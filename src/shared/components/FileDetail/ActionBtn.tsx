@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, TouchableOpacity } from "react-native";
+import { XStack } from "tamagui";
 
 import { useColors } from "@context/providers/themeStore";
 import { BxIcon, type BxIconName } from "@shared/components/BxIcon";
@@ -13,22 +13,17 @@ interface ActionBtnProps {
 export const ActionBtn = ({ icon, onPress, colorOverride }: ActionBtnProps) => {
   const colors = useColors();
   return (
-    <TouchableOpacity
+    <XStack
       onPress={onPress}
-      activeOpacity={0.8}
-      style={[styles.btn, { backgroundColor: colorOverride ?? colors.accent }]}
+      width={40}
+      height={40}
+      borderRadius={20}
+      backgroundColor={colorOverride ?? colors.accent}
+      alignItems="center"
+      justifyContent="center"
+      pressStyle={{ opacity: 0.75 }}
     >
       <BxIcon name={icon} size={17} color={colors.accentForeground} />
-    </TouchableOpacity>
+    </XStack>
   );
 };
-
-const styles = StyleSheet.create({
-  btn: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-});

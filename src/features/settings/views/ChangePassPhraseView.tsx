@@ -1,18 +1,13 @@
 import React from "react";
-import {
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { Text, View, XStack, YStack } from "tamagui";
 
 import { useColors } from "@context/providers/themeStore";
 import { BxIcon } from "@shared/components/BxIcon";
 import { ScreenHeader } from "@shared/components/ScreenHeader";
 import { Button, InputField } from "@shared/components/ui";
 import { LoadingOverlay } from "@shared/components/ui/LoadingOverlay";
-import { Spacing, Typography } from "@shared/constants/design";
+import { Spacing } from "@shared/constants/design";
 
 type Step = "verify" | "new" | "confirm";
 
@@ -34,13 +29,11 @@ const STEP_TITLES: Record<Step, string> = {
   new: "New Pass Phrase",
   confirm: "Confirm New Pass Phrase",
 };
-
 const STEP_SUBTITLES: Record<Step, string> = {
   verify: "Enter your current Pass Phrase to continue.",
   new: "Choose a new Pass Phrase. Min. 4 characters.",
   confirm: "Re-enter your new Pass Phrase to confirm.",
 };
-
 const STEPS: Step[] = ["verify", "new", "confirm"];
 
 export const ChangePassPhraseView = ({
@@ -58,27 +51,33 @@ export const ChangePassPhraseView = ({
   const colors = useColors();
   return (
     <SafeAreaView
-      style={[styles.container, { backgroundColor: colors.background }]}
+      style={{ flex: 1, backgroundColor: colors.background }}
       edges={["top", "bottom"]}
     >
       <LoadingOverlay visible={isLoading} message="Updating Pass Phrase…" />
       <ScreenHeader title={STEP_TITLES[step]} onBack={onBack} />
-      <View style={styles.dots}>
+
+      <XStack
+        gap={Spacing.sm}
+        justifyContent="center"
+        paddingVertical={Spacing.sm}
+      >
         {STEPS.map((s) => (
           <View
             key={s}
-            style={[
-              styles.dot,
-              { backgroundColor: s === step ? colors.accent : colors.border },
-            ]}
+            width={8}
+            height={8}
+            borderRadius={4}
+            backgroundColor={s === step ? colors.accent : colors.border}
           />
         ))}
-      </View>
-      <View style={styles.content}>
-        <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
+      </XStack>
+
+      <YStack flex={1} padding={Spacing["2xl"]} gap={Spacing["2xl"]}>
+        <Text fontSize={15} color={colors.textSecondary} lineHeight={22}>
           {STEP_SUBTITLES[step]}
         </Text>
-        <View style={styles.inputWrapper}>
+        <View style={{ position: "relative" }}>
           <InputField
             label={
               step === "verify"
@@ -96,52 +95,37 @@ export const ChangePassPhraseView = ({
             autoCorrect={false}
             error={error ?? undefined}
           />
-          <TouchableOpacity
+          <XStack
             onPress={onToggleShow}
-            style={styles.eyeBtn}
-            activeOpacity={0.7}
+            style={{
+              position: "absolute",
+              right: 0,
+              bottom: Spacing.xl,
+              padding: Spacing.sm,
+            }}
+            pressStyle={{ opacity: 0.7 }}
           >
             <BxIcon
               name={showPhrase ? "bx-hide" : "bx-show"}
               size={18}
               color={colors.textTertiary}
             />
-          </TouchableOpacity>
+          </XStack>
         </View>
-      </View>
-      <View style={[styles.footer, { backgroundColor: colors.background }]}>
+      </YStack>
+
+      <YStack
+        padding={Spacing["2xl"]}
+        paddingTop={Spacing.md}
+        backgroundColor={colors.background}
+      >
         <Button
           label={primaryLabel}
           onPress={onPrimary}
           loading={isLoading}
           fullWidth
         />
-      </View>
+      </YStack>
     </SafeAreaView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: { flex: 1 },
-  dots: {
-    flexDirection: "row",
-    gap: Spacing.sm,
-    justifyContent: "center",
-    paddingVertical: Spacing.sm,
-  },
-  dot: { width: 8, height: 8, borderRadius: 4 },
-  content: {
-    flex: 1,
-    padding: Spacing["2xl"],
-    gap: Spacing["2xl"],
-  },
-  subtitle: { ...Typography.bodyMD, lineHeight: 22 },
-  inputWrapper: { position: "relative" },
-  eyeBtn: {
-    position: "absolute",
-    right: 0,
-    bottom: Spacing.xl,
-    padding: Spacing.sm,
-  },
-  footer: { padding: Spacing["2xl"], paddingTop: Spacing.md },
-});

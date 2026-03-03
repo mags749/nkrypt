@@ -1,12 +1,7 @@
 import React from "react";
-import {
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-  StyleSheet,
-  View,
-} from "react-native";
+import { KeyboardAvoidingView, Platform, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { YStack } from "tamagui";
 
 import { useColors } from "@context/providers/themeStore";
 import { ChangePassKeyNewStep } from "@features/settings/views/ChangePassKeyNewStep";
@@ -56,17 +51,21 @@ export const ChangePassKeyView = ({
   const colors = useColors();
   return (
     <SafeAreaView
-      style={[styles.container, { backgroundColor: colors.background }]}
+      style={{ flex: 1, backgroundColor: colors.background }}
       edges={["top", "bottom"]}
     >
       <LoadingOverlay visible={isLoading} message="Re-encrypting all files…" />
       <ScreenHeader title="Change Pass Key" onBack={onBack} />
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
-        style={styles.flex}
+        style={{ flex: 1 }}
       >
         <ScrollView
-          contentContainerStyle={styles.scroll}
+          contentContainerStyle={{
+            padding: Spacing["2xl"],
+            paddingTop: Spacing.lg,
+            gap: Spacing["2xl"],
+          }}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
@@ -90,7 +89,11 @@ export const ChangePassKeyView = ({
             />
           )}
         </ScrollView>
-        <View style={[styles.footer, { backgroundColor: colors.background }]}>
+        <YStack
+          padding={Spacing["2xl"]}
+          paddingTop={Spacing.md}
+          backgroundColor={colors.background}
+        >
           {step === "verify" ? (
             <Button label="Continue" onPress={onVerify} fullWidth />
           ) : (
@@ -102,19 +105,8 @@ export const ChangePassKeyView = ({
               fullWidth
             />
           )}
-        </View>
+        </YStack>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: { flex: 1 },
-  flex: { flex: 1 },
-  scroll: {
-    padding: Spacing["2xl"],
-    paddingTop: Spacing.lg,
-    gap: Spacing["2xl"],
-  },
-  footer: { padding: Spacing["2xl"], paddingTop: Spacing.md },
-});

@@ -2,7 +2,10 @@ import { useRef, useState } from "react";
 import { Animated } from "react-native";
 import { useRouter } from "expo-router";
 import { useAuthStore } from "@features/auth/store/authStore";
-import { PASSKEY_MIN_LENGTH, PASSKEY_MAX_VALUE } from "@shared/components/PassKeyInput";
+import {
+  PASSKEY_MIN_LENGTH,
+  PASSKEY_MAX_VALUE,
+} from "@shared/components/PassKeyInput";
 
 export const useSetup = () => {
   const router = useRouter();

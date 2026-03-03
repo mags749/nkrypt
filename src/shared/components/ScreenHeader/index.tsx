@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Text, View, XStack } from "tamagui";
 
 import { useColors } from "@context/providers/themeStore";
 import { BxIcon } from "@shared/components/BxIcon";
@@ -14,38 +14,34 @@ interface ScreenHeaderProps {
 export const ScreenHeader = ({ title, onBack, right }: ScreenHeaderProps) => {
   const colors = useColors();
   return (
-    <View style={styles.row}>
-      <TouchableOpacity
+    <XStack
+      flexDirection="row"
+      alignItems="center"
+      paddingHorizontal={Spacing.lg}
+      paddingVertical={Spacing.md}
+    >
+      <XStack
         onPress={onBack}
-        activeOpacity={0.7}
-        style={styles.side}
+        width={34}
+        alignItems="center"
+        pressStyle={{ opacity: 0.7 }}
       >
         <BxIcon name="bx-chevron-left" size={26} color={colors.textPrimary} />
-      </TouchableOpacity>
+      </XStack>
       <Text
-        style={[styles.title, { color: colors.textPrimary }]}
+        flex={1}
+        textAlign="center"
+        fontSize={20}
+        fontWeight="600"
+        letterSpacing={-0.3}
+        color={colors.textPrimary}
         numberOfLines={1}
       >
         {title}
       </Text>
-      <View style={styles.side}>{right ?? null}</View>
-    </View>
+      <View width={34} alignItems="center">
+        {right ?? null}
+      </View>
+    </XStack>
   );
 };
-
-const styles = StyleSheet.create({
-  row: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: Spacing.lg,
-    paddingVertical: Spacing.md,
-  },
-  side: { width: 34, alignItems: "center" },
-  title: {
-    flex: 1,
-    textAlign: "center",
-    fontSize: 20,
-    fontWeight: "600",
-    letterSpacing: -0.3,
-  },
-});

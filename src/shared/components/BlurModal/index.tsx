@@ -1,31 +1,9 @@
-import { BlurView } from "expo-blur";
 import React from "react";
-import {
-  KeyboardAvoidingView,
-  Modal,
-  Platform,
-  StyleSheet,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { KeyboardAvoidingView, Platform } from "react-native";
+import { Dialog } from "tamagui";
 
-import { Radius, Shadow, Spacing } from "@shared/constants/design";
+import { Radius, Spacing } from "@shared/constants/design";
 import { useColors } from "@context/providers/themeStore";
-
-// ─── Types ────────────────────────────────────────────────────────────────────
-
-interface BlurModalProps {
-  visible: boolean;
-  onDismiss: () => void;
-  children: React.ReactNode;
-  /** Controls how far up the dialog sits from the bottom. Default: 'flex-end' */
-  position?: "center" | "flex-end";
-}
-
-// ─── BlurModal ────────────────────────────────────────────────────────────────
-// A modal with a live blurred background that pushes up with the keyboard.
-// Uses expo-blur's BlurView on iOS for a native glass effect.
-// Falls back to a dark semi-transparent overlay on Android.
 
 export const BlurModal = ({
   visible,
@@ -36,76 +14,54 @@ export const BlurModal = ({
   const colors = useColors();
 
   return (
-    <Modal
-      transparent
-      visible={visible}
-      animationType="slide"
-      statusBarTranslucent
-      onRequestClose={onDismiss}
+    <Dialog
+      modal={false}
+      open={visible}
+      onOpenChange={(open) => !open && onDismiss()}
     >
-      {/* Blur backdrop — tapping it dismisses */}
-      <TouchableOpacity
-        activeOpacity={1}
-        onPress={onDismiss}
-        style={StyleSheet.absoluteFillObject}
-      >
-        {Platform.OS === "ios" ? (
-          <BlurView
-            intensity={55}
-            tint="dark"
-            style={StyleSheet.absoluteFillObject}
-          />
-        ) : (
-          <View
-            style={[StyleSheet.absoluteFillObject, styles.androidBackdrop]}
-          />
-        )}
-      </TouchableOpacity>
-
-      {/* Dialog — does NOT dismiss on tap */}
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        style={[styles.avoidingView, { justifyContent: position }]}
-        pointerEvents="box-none"
-      >
-        <TouchableOpacity
-          activeOpacity={1}
-          onPress={() => {}}
-          pointerEvents="box-none"
-        >
-          <View
-            style={[
-              styles.dialog,
-              {
-                backgroundColor: colors.surface,
-                borderColor: colors.border,
+      <Dialog.Portal>
+        <Dialog.Overlay
+          backgroundColor="rgba(0,0,0,0.5)" // Semi-transparent black
+          opacity={0.2}
+          animateOnly={["transform", "opacity"]}
+          transition={[
+            "fast",
+            {
+              opacity: {
+                overshootClamping: true,
               },
-              Shadow.xl,
-            ]}
+            },
+          ]}
+          enterStyle={{ opacity: 0 }}
+          exitStyle={{ opacity: 0 }}
+        />
+
+        <Dialog.Content
+          bordered
+          elevate
+          key="content"
+          transition="fast"
+          enterStyle={{ opacity: 0, scale: 0.95, y: 10 }}
+          exitStyle={{ opacity: 0, scale: 0.95, y: 10 }}
+          // Layout styling
+          background={colors.background}
+          br={Radius.xl}
+          p={Spacing["2xl"]}
+          width="90%"
+          maxWidth={450}
+          alignSelf="center"
+          style={{
+            marginBottom: position === "flex-end" ? Spacing["3xl"] : "auto",
+          }}
+        >
+          <KeyboardAvoidingView
+            behavior={Platform.OS === "ios" ? "padding" : "height"}
+            style={{ width: "100%" }}
           >
             {children}
-          </View>
-        </TouchableOpacity>
-      </KeyboardAvoidingView>
-    </Modal>
+          </KeyboardAvoidingView>
+        </Dialog.Content>
+      </Dialog.Portal>
+    </Dialog>
   );
 };
-
-// ─── Styles ───────────────────────────────────────────────────────────────────
-
-const styles = StyleSheet.create({
-  androidBackdrop: {
-    backgroundColor: "rgba(0, 0, 0, 0.72)",
-  },
-  avoidingView: {
-    flex: 1,
-    padding: Spacing["2xl"],
-    paddingBottom: Spacing["3xl"],
-  },
-  dialog: {
-    borderRadius: Radius.xl,
-    borderWidth: 1,
-    padding: Spacing["2xl"],
-    paddingTop: Spacing["3xl"],
-  },
-});

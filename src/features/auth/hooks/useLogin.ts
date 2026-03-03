@@ -38,11 +38,31 @@ export const useLogin = () => {
 
   const shake = useCallback(() => {
     Animated.sequence([
-      Animated.timing(shakeAnim, { toValue: 10, duration: 55, useNativeDriver: true }),
-      Animated.timing(shakeAnim, { toValue: -10, duration: 55, useNativeDriver: true }),
-      Animated.timing(shakeAnim, { toValue: 7, duration: 55, useNativeDriver: true }),
-      Animated.timing(shakeAnim, { toValue: -7, duration: 55, useNativeDriver: true }),
-      Animated.timing(shakeAnim, { toValue: 0, duration: 55, useNativeDriver: true }),
+      Animated.timing(shakeAnim, {
+        toValue: 10,
+        duration: 55,
+        useNativeDriver: true,
+      }),
+      Animated.timing(shakeAnim, {
+        toValue: -10,
+        duration: 55,
+        useNativeDriver: true,
+      }),
+      Animated.timing(shakeAnim, {
+        toValue: 7,
+        duration: 55,
+        useNativeDriver: true,
+      }),
+      Animated.timing(shakeAnim, {
+        toValue: -7,
+        duration: 55,
+        useNativeDriver: true,
+      }),
+      Animated.timing(shakeAnim, {
+        toValue: 0,
+        duration: 55,
+        useNativeDriver: true,
+      }),
     ]).start();
   }, [shakeAnim]);
 

@@ -1,7 +1,7 @@
 import React from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { Text, View, YStack } from "tamagui";
 import { useColors } from "@context/providers/themeStore";
-import { Radius, Spacing, Typography } from "@shared/constants/design";
+import { Radius, Spacing } from "@shared/constants/design";
 
 interface SectionGroupProps {
   title?: string;
@@ -11,30 +11,27 @@ interface SectionGroupProps {
 export const SectionGroup = ({ title, children }: SectionGroupProps) => {
   const colors = useColors();
   return (
-    <View style={styles.container}>
+    <YStack gap={Spacing.sm}>
       {title && (
-        <Text style={[styles.title, { color: colors.textTertiary }]}>
+        <Text
+          color={colors.textTertiary}
+          fontSize={10}
+          fontWeight="500"
+          letterSpacing={1.0}
+          paddingHorizontal={Spacing.xs}
+        >
           {title.toUpperCase()}
         </Text>
       )}
       <View
-        style={[
-          styles.card,
-          { backgroundColor: colors.surface, borderColor: colors.border },
-        ]}
+        borderRadius={Radius.lg}
+        borderWidth={1}
+        borderColor={colors.border}
+        backgroundColor={colors.surface}
+        overflow="hidden"
       >
         {children}
       </View>
-    </View>
+    </YStack>
   );
 };
-
-const styles = StyleSheet.create({
-  container: { gap: Spacing.sm },
-  title: {
-    ...Typography.labelSM,
-    letterSpacing: 1.0,
-    paddingHorizontal: Spacing.xs,
-  },
-  card: { borderRadius: Radius.lg, borderWidth: 1, overflow: "hidden" },
-});

@@ -13,6 +13,9 @@ export default function FolderDetailScreen() {
       onFilePress={hook.onFilePress}
       onDeleteFile={hook.onDeleteFile}
       onNewFile={hook.onNewFile}
+      onDeleteFolder={hook.onDeleteFolder}
+      onEditFolder={hook.onEditFolder}
+      openMoreOptionSheet={hook.openMoreOptionSheet}
     />
   );
 }

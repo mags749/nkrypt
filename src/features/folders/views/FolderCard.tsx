@@ -1,9 +1,9 @@
 import React from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Text, XStack, YStack } from "tamagui";
 
 import { useColors } from "@context/providers/themeStore";
 import { BxIcon } from "@shared/components/BxIcon";
-import { Radius, Spacing, Typography } from "@shared/constants/design";
+import { Spacing } from "@shared/constants/design";
 import type { FolderWithCount } from "@shared/types";
 
 interface FolderCardProps {
@@ -15,33 +15,28 @@ interface FolderCardProps {
 export const FolderCard = ({ folder, onPress, onEdit }: FolderCardProps) => {
   const colors = useColors();
   return (
-    <TouchableOpacity
+    <XStack
       onPress={onPress}
-      activeOpacity={0.7}
-      style={[styles.card]}
+      alignItems="center"
+      padding={Spacing.lg}
+      pressStyle={{ opacity: 0.7 }}
     >
-      <View style={styles.content}>
-        <Text style={[styles.name, { color: colors.textPrimary }]}>
+      <YStack flex={1} gap={4}>
+        <Text
+          fontSize={20}
+          fontWeight="600"
+          letterSpacing={-0.2}
+          color={colors.textPrimary}
+        >
           {folder.name}
         </Text>
-        <Text style={[styles.meta, { color: colors.textTertiary }]}>
+        <Text fontSize={13} color={colors.textTertiary}>
           {folder.fileCount === 1 ? "1 file" : `${folder.fileCount} files`}
         </Text>
-      </View>
-      <TouchableOpacity onPress={onEdit} activeOpacity={0.7} hitSlop={8}>
+      </YStack>
+      <XStack onPress={onEdit} pressStyle={{ opacity: 0.7 }} hitSlop={8}>
         <BxIcon name="pencil" size={16} color={colors.textTertiary} />
-      </TouchableOpacity>
-    </TouchableOpacity>
+      </XStack>
+    </XStack>
   );
 };
-
-const styles = StyleSheet.create({
-  card: {
-    flexDirection: "row",
-    alignItems: "center",
-    padding: Spacing.lg,
-  },
-  content: { flex: 1, gap: 4 },
-  name: { fontSize: 17, fontWeight: "600", letterSpacing: -0.2 },
-  meta: { ...Typography.bodySM },
-});

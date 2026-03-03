@@ -1,17 +1,12 @@
 import React from "react";
-import {
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { Text, View, XStack, YStack } from "tamagui";
 
 import { useColors } from "@context/providers/themeStore";
 import { BxIcon } from "@shared/components/BxIcon";
 import { BlurModal } from "@shared/components/BlurModal";
 import { Button, InputField } from "@shared/components/ui";
 import { LoadingOverlay } from "@shared/components/ui/LoadingOverlay";
-import { Radius, Spacing, Typography } from "@shared/constants/design";
+import { Radius, Spacing } from "@shared/constants/design";
 
 interface CreateFolderViewProps {
   isEditing: boolean;
@@ -50,24 +45,32 @@ export const CreateFolderView = ({
         message={isEditing ? "Updating folder…" : "Creating folder…"}
       />
 
-      {/* Header */}
-      <View style={styles.header}>
-        <View style={styles.titleBlock}>
-          <Text style={[styles.title, { color: colors.textPrimary }]}>
+      <XStack
+        alignItems="flex-start"
+        justifyContent="space-between"
+        marginBottom={Spacing["2xl"]}
+        gap={Spacing.md}
+      >
+        <YStack flex={1} gap={Spacing.xs}>
+          <Text
+            fontSize={22}
+            fontWeight="700"
+            letterSpacing={-0.3}
+            color={colors.textPrimary}
+          >
             {isEditing ? "Edit Folder" : "Create Folder"}
           </Text>
-          <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
+          <Text fontSize={15} color={colors.textSecondary}>
             {isEditing
               ? "Update the folder name or category."
               : "Give your folder a name and category."}
           </Text>
-        </View>
-        <TouchableOpacity onPress={onClose} activeOpacity={0.7}>
+        </YStack>
+        <XStack onPress={onClose} pressStyle={{ opacity: 0.7 }}>
           <BxIcon name="bx-x" size={22} color={colors.textSecondary} />
-        </TouchableOpacity>
-      </View>
+        </XStack>
+      </XStack>
 
-      {/* Folder Name */}
       <InputField
         label="Folder Name"
         value={name}
@@ -77,17 +80,26 @@ export const CreateFolderView = ({
         error={error ?? undefined}
       />
 
-      {/* Category Picker */}
-      <View style={styles.catSection}>
-        <Text style={[styles.catLabel, { color: colors.textTertiary }]}>
+      <YStack marginBottom={Spacing.xl}>
+        <Text
+          color={colors.textTertiary}
+          fontSize={11}
+          fontWeight="600"
+          letterSpacing={1.0}
+          marginBottom={Spacing.sm}
+        >
           CATEGORY
         </Text>
-        <TouchableOpacity
+        <XStack
           onPress={onTogglePicker}
-          activeOpacity={0.7}
-          style={[styles.dropdown, { borderBottomColor: colors.border }]}
+          alignItems="center"
+          justifyContent="space-between"
+          paddingVertical={Spacing.sm}
+          borderBottomWidth={1}
+          borderBottomColor={colors.border}
+          pressStyle={{ opacity: 0.7 }}
         >
-          <Text style={[styles.dropdownVal, { color: colors.textPrimary }]}>
+          <Text fontSize={17} color={colors.textPrimary}>
             {category}
           </Text>
           <BxIcon
@@ -95,36 +107,41 @@ export const CreateFolderView = ({
             size={20}
             color={colors.textSecondary}
           />
-        </TouchableOpacity>
-      </View>
+        </XStack>
+      </YStack>
 
       {pickerOpen && (
-        <View
-          style={[
-            styles.pickerList,
-            { backgroundColor: colors.surface, borderColor: colors.border },
-          ]}
+        <YStack
+          borderRadius={Radius.md}
+          borderWidth={1}
+          borderColor={colors.border}
+          overflow="hidden"
+          marginTop={Spacing.sm}
+          marginBottom={Spacing.lg}
+          backgroundColor={colors.surface}
         >
-          {categories.map((cat) => (
-            <TouchableOpacity
+          {categories.map((cat, i) => (
+            <XStack
               key={cat}
               onPress={() => onCategorySelect(cat)}
-              activeOpacity={0.7}
-              style={[
-                styles.pickerItem,
-                { borderBottomColor: colors.separator },
-              ]}
+              alignItems="center"
+              padding={Spacing.lg}
+              gap={Spacing.md}
+              borderBottomWidth={i < categories.length - 1 ? 1 : 0}
+              borderBottomColor={colors.separator}
+              pressStyle={{ opacity: 0.7 }}
             >
-              <View
-                style={[
-                  styles.checkbox,
-                  {
-                    borderColor:
-                      category === cat ? colors.accent : colors.border,
-                    backgroundColor:
-                      category === cat ? colors.accent : "transparent",
-                  },
-                ]}
+              <XStack
+                width={22}
+                height={22}
+                borderRadius={4}
+                borderWidth={1.5}
+                borderColor={category === cat ? colors.accent : colors.border}
+                backgroundColor={
+                  category === cat ? colors.accent : "transparent"
+                }
+                alignItems="center"
+                justifyContent="center"
               >
                 {category === cat && (
                   <BxIcon
@@ -133,24 +150,31 @@ export const CreateFolderView = ({
                     color={colors.accentForeground}
                   />
                 )}
-              </View>
-              <Text
-                style={[styles.pickerText, { color: colors.textPrimary }]}
-              >
+              </XStack>
+              <Text fontSize={15} fontWeight="500" color={colors.textPrimary}>
                 {cat}
               </Text>
-            </TouchableOpacity>
+            </XStack>
           ))}
-        </View>
+        </YStack>
       )}
 
-      {/* Actions */}
-      <View style={styles.actions}>
-        <TouchableOpacity onPress={onClose} activeOpacity={0.7}>
-          <Text style={[styles.cancel, { color: colors.textSecondary }]}>
+      <XStack
+        alignItems="center"
+        justifyContent="flex-end"
+        gap={Spacing.lg}
+        marginTop={Spacing.sm}
+      >
+        <XStack onPress={onClose} pressStyle={{ opacity: 0.7 }}>
+          <Text
+            color={colors.textSecondary}
+            fontSize={12}
+            fontWeight="600"
+            letterSpacing={1.5}
+          >
             CANCEL
           </Text>
-        </TouchableOpacity>
+        </XStack>
         <Button
           label={isEditing ? "Update" : "Save"}
           onPress={onSave}
@@ -158,61 +182,7 @@ export const CreateFolderView = ({
           loadingLabel="Saving…"
           size="md"
         />
-      </View>
+      </XStack>
     </BlurModal>
   );
 };
-
-const styles = StyleSheet.create({
-  header: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    justifyContent: "space-between",
-    marginBottom: Spacing["2xl"],
-    gap: Spacing.md,
-  },
-  titleBlock: { flex: 1, gap: Spacing.xs },
-  title: { fontSize: 22, fontWeight: "700", letterSpacing: -0.3 },
-  subtitle: { ...Typography.bodyMD },
-  catSection: { marginBottom: Spacing.xl },
-  catLabel: { ...Typography.labelMD, marginBottom: Spacing.sm },
-  dropdown: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingVertical: Spacing.sm,
-    borderBottomWidth: 1,
-  },
-  dropdownVal: { ...Typography.bodyLG },
-  pickerList: {
-    borderRadius: Radius.md,
-    borderWidth: 1,
-    overflow: "hidden",
-    marginTop: Spacing.sm,
-    marginBottom: Spacing.lg,
-  },
-  pickerItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    padding: Spacing.lg,
-    gap: Spacing.md,
-    borderBottomWidth: 1,
-  },
-  checkbox: {
-    width: 22,
-    height: 22,
-    borderRadius: 4,
-    borderWidth: 1.5,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  pickerText: { ...Typography.bodyMD, fontWeight: "500" },
-  actions: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "flex-end",
-    gap: Spacing.lg,
-    marginTop: Spacing.sm,
-  },
-  cancel: { ...Typography.labelLG, letterSpacing: 1.5 },
-});

@@ -1,17 +1,12 @@
 import React from "react";
-import {
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { Text, View, XStack, YStack } from "tamagui";
 
 import { useColors } from "@context/providers/themeStore";
 import { BxIcon } from "@shared/components/BxIcon";
 import { BlurModal } from "@shared/components/BlurModal";
 import { Button, InputField } from "@shared/components/ui";
 import { LoadingOverlay } from "@shared/components/ui/LoadingOverlay";
-import { Spacing, Typography } from "@shared/constants/design";
+import { Radius, Spacing } from "@shared/constants/design";
 
 interface CreateFileViewProps {
   isEditing: boolean;
@@ -52,24 +47,32 @@ export const CreateFileView = ({
         message={isEditing ? "Updating entry…" : "Encrypting & saving…"}
       />
 
-      {/* Header */}
-      <View style={styles.header}>
-        <View style={styles.titleBlock}>
-          <Text style={[styles.title, { color: colors.textPrimary }]}>
+      <XStack
+        alignItems="flex-start"
+        justifyContent="space-between"
+        marginBottom={Spacing["2xl"]}
+        gap={Spacing.md}
+      >
+        <YStack flex={1} gap={Spacing.xs}>
+          <Text
+            fontSize={22}
+            fontWeight="700"
+            letterSpacing={-0.3}
+            color={colors.textPrimary}
+          >
             {isEditing ? "Edit Entry" : "New Entry"}
           </Text>
-          <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
+          <Text fontSize={15} color={colors.textSecondary}>
             {isEditing
               ? "Update the entry details below."
               : "Fill in the credentials to encrypt and save."}
           </Text>
-        </View>
-        <TouchableOpacity onPress={onClose} activeOpacity={0.7}>
+        </YStack>
+        <XStack onPress={onClose} pressStyle={{ opacity: 0.7 }}>
           <BxIcon name="bx-x" size={22} color={colors.textSecondary} />
-        </TouchableOpacity>
-      </View>
+        </XStack>
+      </XStack>
 
-      {/* Fields */}
       <InputField
         label="Site"
         value={site}
@@ -87,12 +90,11 @@ export const CreateFileView = ({
         keyboardType="email-address"
         error={errors.username}
       />
-      <View style={styles.credsWrapper}>
+
+      <View style={{ position: "relative" }}>
         <InputField
           label={
-            isEditing
-              ? "New Credentials (blank = keep current)"
-              : "Credentials"
+            isEditing ? "New Credentials (blank = keep current)" : "Credentials"
           }
           value={credentials}
           onChangeText={onCredentialsChange}
@@ -100,41 +102,70 @@ export const CreateFileView = ({
           secureTextEntry={!showCreds}
           error={errors.credentials}
         />
-        <TouchableOpacity
+        <XStack
           onPress={onToggleCreds}
-          style={styles.eyeBtn}
-          activeOpacity={0.7}
+          style={{
+            position: "absolute",
+            right: 0,
+            bottom: Spacing.xl,
+            padding: Spacing.sm,
+          }}
+          pressStyle={{ opacity: 0.7 }}
         >
           <BxIcon
             name={showCreds ? "bx-hide" : "bx-show"}
             size={18}
             color={colors.textTertiary}
           />
-        </TouchableOpacity>
+        </XStack>
       </View>
 
-      <View
-        style={[styles.note, { backgroundColor: colors.surfaceSecondary }]}
+      <XStack
+        alignItems="center"
+        gap={Spacing.sm}
+        padding={Spacing.md}
+        borderRadius={8}
+        marginBottom={Spacing.sm}
+        backgroundColor={colors.surfaceSecondary}
       >
         <BxIcon name="bx-lock-alt" size={14} color={colors.textTertiary} />
-        <Text style={[styles.noteText, { color: colors.textTertiary }]}>
+        <Text
+          color={colors.textTertiary}
+          fontSize={12}
+          flex={1}
+          lineHeight={18}
+        >
           Credentials encrypted with AES-256 using your Pass Key
         </Text>
-      </View>
+      </XStack>
 
-      {errors.general ? (
-        <Text style={[styles.genErr, { color: colors.error }]}>
+      {errors.general && (
+        <Text
+          color={colors.error}
+          fontSize={13}
+          textAlign="center"
+          marginBottom={Spacing.sm}
+        >
           {errors.general}
         </Text>
-      ) : null}
+      )}
 
-      {/* Actions */}
-      <View style={styles.actions}>
-        <TouchableOpacity onPress={onClose} activeOpacity={0.7}>
-          <Text style={[styles.cancel, { color: colors.textSecondary }]}>
+      <XStack
+        alignItems="center"
+        justifyContent="flex-end"
+        gap={Spacing.lg}
+        marginTop={Spacing.sm}
+      >
+        <XStack onPress={onClose} pressStyle={{ opacity: 0.7 }}>
+          <Text
+            color={colors.textSecondary}
+            fontSize={12}
+            fontWeight="600"
+            letterSpacing={1.5}
+          >
             CANCEL
           </Text>
-        </TouchableOpacity>
+        </XStack>
         <Button
           label={isEditing ? "Update" : "Save"}
           loading={isLoading}
@@ -142,45 +173,7 @@ export const CreateFileView = ({
           onPress={onSave}
           size="md"
         />
-      </View>
+      </XStack>
     </BlurModal>
   );
 };
-
-const styles = StyleSheet.create({
-  header: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    justifyContent: "space-between",
-    marginBottom: Spacing["2xl"],
-    gap: Spacing.md,
-  },
-  titleBlock: { flex: 1, gap: Spacing.xs },
-  title: { fontSize: 22, fontWeight: "700", letterSpacing: -0.3 },
-  subtitle: { ...Typography.bodyMD },
-  credsWrapper: { position: "relative" },
-  eyeBtn: {
-    position: "absolute",
-    right: 0,
-    bottom: Spacing.xl,
-    padding: Spacing.sm,
-  },
-  note: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: Spacing.sm,
-    padding: Spacing.md,
-    borderRadius: 8,
-    marginBottom: Spacing.sm,
-  },
-  noteText: { fontSize: 12, flex: 1, lineHeight: 18 },
-  genErr: { fontSize: 13, textAlign: "center", marginBottom: Spacing.sm },
-  actions: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "flex-end",
-    gap: Spacing.lg,
-    marginTop: Spacing.sm,
-  },
-  cancel: { ...Typography.labelLG, letterSpacing: 1.5 },
-});

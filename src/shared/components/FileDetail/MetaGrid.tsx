@@ -1,10 +1,10 @@
 import { format, formatDistanceToNow } from "date-fns";
 import React from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { Text, View, XStack, YStack } from "tamagui";
 
 import { useColors } from "@context/providers/themeStore";
 import { BxIcon } from "@shared/components/BxIcon";
-import { Spacing, Typography } from "@shared/constants/design";
+import { Spacing } from "@shared/constants/design";
 
 interface MetaGridProps {
   createdAt: number;
@@ -21,19 +21,19 @@ const MetaCell = ({
 }) => {
   const colors = useColors();
   return (
-    <View style={cellStyles.container}>
-      <Text style={[cellStyles.label, { color: colors.textTertiary }]}>
+    <YStack width="45%" gap={4}>
+      <Text
+        color={colors.textTertiary}
+        fontSize={10}
+        fontWeight="500"
+        letterSpacing={0.8}
+      >
         {label}
       </Text>
       {children}
-    </View>
+    </YStack>
   );
 };
-
-const cellStyles = StyleSheet.create({
-  container: { width: "45%", gap: 4 },
-  label: { ...Typography.labelSM, letterSpacing: 0.8 },
-});
 
 export const MetaGrid = ({
   createdAt,
@@ -47,43 +47,37 @@ export const MetaGrid = ({
   });
 
   return (
-    <View style={[styles.grid, { borderTopColor: colors.separator }]}>
+    <XStack
+      flexWrap="wrap"
+      marginTop={Spacing["3xl"]}
+      paddingTop={Spacing["2xl"]}
+      borderTopWidth={1}
+      borderTopColor={colors.separator}
+      gap={Spacing["2xl"]}
+    >
       <MetaCell label="CREATED">
-        <Text style={[styles.value, { color: colors.textPrimary }]}>
+        <Text color={colors.textPrimary} fontSize={15} fontWeight="500">
           {createdStr}
         </Text>
       </MetaCell>
       <MetaCell label="MODIFIED">
-        <Text style={[styles.value, { color: colors.textPrimary }]}>
+        <Text color={colors.textPrimary} fontSize={15} fontWeight="500">
           {modifiedStr}
         </Text>
       </MetaCell>
       <MetaCell label="ENCRYPTION">
-        <View style={styles.encRow}>
-          <Text style={[styles.value, { color: colors.textPrimary }]}>
+        <XStack alignItems="center" gap={4}>
+          <Text color={colors.textPrimary} fontSize={15} fontWeight="500">
             AES-256
           </Text>
           <BxIcon name="bx-lock-alt" size={14} color={colors.textTertiary} />
-        </View>
+        </XStack>
       </MetaCell>
       <MetaCell label="FOLDER">
-        <Text style={[styles.value, { color: colors.textPrimary }]}>
+        <Text color={colors.textPrimary} fontSize={15} fontWeight="500">
           {folderName}
         </Text>
       </MetaCell>
-    </View>
+    </XStack>
   );
 };
-
-const styles = StyleSheet.create({
-  grid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    marginTop: Spacing["3xl"],
-    paddingTop: Spacing["2xl"],
-    borderTopWidth: 1,
-    gap: Spacing["2xl"],
-  },
-  value: { ...Typography.bodyMD, fontWeight: "500" },
-  encRow: { flexDirection: "row", alignItems: "center", gap: 4 },
-});

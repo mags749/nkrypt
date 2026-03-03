@@ -62,6 +62,10 @@ export async function bootstrapDatabase(): Promise<void> {
     const migrations: Array<{ sql: string; description: string }> = [
       // Future migrations go here, e.g.:
       // { sql: 'ALTER TABLE folders ADD COLUMN icon TEXT', description: 'folders.icon' },
+      {
+        sql: "ALTER TABLE files ADD COLUMN encrypted_username TEXT NOT NULL DEFAULT ''",
+        description: "files.encrypted_username",
+      },
     ];
 
     for (const migration of migrations) {

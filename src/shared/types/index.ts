@@ -31,7 +31,8 @@ export interface NkryptFile {
   id: string;
   folderId: string;
   site: string;
-  username: string;
+  username: string; // legacy plaintext — empty for new rows; use encryptedUsername
+  encryptedUsername: string; // AES-256 encrypted
   encryptedCredentials: string; // AES-256 encrypted
   createdAt: number;
   updatedAt: number;

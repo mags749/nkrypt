@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useFilesStore } from "@features/files/store/filesStore";
+import { useAuthStore } from "@features/auth/store/authStore";
 
 export const useCreateFile = () => {
   const router = useRouter();
@@ -8,7 +9,8 @@ export const useCreateFile = () => {
     folderId?: string;
     editId?: string;
   }>();
-  const { createFile, updateFile, filesByFolder } = useFilesStore();
+  const { createFile, updateFile, filesByFolder, decryptFileUsername } =
+    useFilesStore();
   const editFile = editId
     ? Object.values(filesByFolder)
         .flat()
@@ -16,8 +18,16 @@ export const useCreateFile = () => {
     : undefined;
   const isEditing = Boolean(editFile);
 
+  // Pre-fill username for edit: decrypt using session passkey
+  const getInitialUsername = () => {
+    if (!editFile) return "";
+    const passKey = useAuthStore.getState().getPassKey();
+    if (!passKey) return "";
+    return decryptFileUsername(editFile, passKey) ?? "";
+  };
+
   const [site, setSite] = useState(editFile?.site ?? "");
-  const [username, setUsername] = useState(editFile?.username ?? "");
+  const [username, setUsername] = useState(() => getInitialUsername());
   const [credentials, setCredentials] = useState("");
   const [showCreds, setShowCreds] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
