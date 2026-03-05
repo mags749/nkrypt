@@ -16,6 +16,12 @@ export default function FolderDetailScreen() {
       onDeleteFolder={hook.onDeleteFolder}
       onEditFolder={hook.onEditFolder}
       openMoreOptionSheet={hook.openMoreOptionSheet}
+      deleteFileDialogOpen={hook.deleteFileDialogOpen}
+      setDeleteFileDialogOpen={hook.setDeleteFileDialogOpen}
+      onConfirmDeleteFile={hook.onConfirmDeleteFile}
+      deleteFolderDialogOpen={hook.deleteFolderDialogOpen}
+      setDeleteFolderDialogOpen={hook.setDeleteFolderDialogOpen}
+      onConfirmDeleteFolder={hook.onConfirmDeleteFolder}
     />
   );
 }

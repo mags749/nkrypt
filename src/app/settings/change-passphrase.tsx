@@ -16,6 +16,7 @@ export default function ChangePassPhraseScreen() {
       onToggleShow={() => hook.setShowPhrase((v) => !v)}
       isLoading={hook.isLoading}
       error={hook.error}
+      verifyAttempts={hook.verifyAttempts}
       primaryLabel={hook.primaryLabel}
       onPrimary={hook.onPrimary}
       onBack={hook.onBack}

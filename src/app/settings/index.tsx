@@ -22,6 +22,14 @@ export default function SettingsScreen() {
       onEula={hook.onEula}
       onWipeData={hook.onWipeData}
       onBack={hook.onBack}
+      lockDialogOpen={hook.lockDialogOpen}
+      setLockDialogOpen={hook.setLockDialogOpen}
+      onConfirmLock={hook.onConfirmLock}
+      wipeDialogOpen={hook.wipeDialogOpen}
+      setWipeDialogOpen={hook.setWipeDialogOpen}
+      onConfirmWipe={hook.onConfirmWipe}
+      biometricErrorVisible={hook.biometricErrorVisible}
+      setBiometricErrorVisible={hook.setBiometricErrorVisible}
     />
   );
 }

@@ -17,6 +17,14 @@ export default function CategoriesScreen() {
       onSaveEdit={hook.onSaveEdit}
       onDelete={hook.onDelete}
       onBack={hook.onBack}
+      duplicateDialogOpen={hook.duplicateDialogOpen}
+      setDuplicateDialogOpen={hook.setDuplicateDialogOpen}
+      defaultCategoryDialogOpen={hook.defaultCategoryDialogOpen}
+      setDefaultCategoryDialogOpen={hook.setDefaultCategoryDialogOpen}
+      deleteDialogOpen={hook.deleteDialogOpen}
+      setDeleteDialogOpen={hook.setDeleteDialogOpen}
+      pendingDeleteName={hook.pendingDeleteName}
+      onConfirmDelete={hook.onConfirmDelete}
     />
   );
 }

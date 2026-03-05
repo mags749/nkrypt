@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Animated } from "react-native";
+import { Animated, BackHandler } from "react-native";
 import { useRouter } from "expo-router";
 
 import {
@@ -7,6 +7,10 @@ import {
   type BiometricInfo,
 } from "@features/auth/store/authStore";
 import { PASSKEY_MIN_LENGTH } from "@shared/components/PassKeyInput";
+
+// Shared global attempt counter — persists across re-renders, resets on success
+let globalLoginAttempts = 0;
+export const resetLoginAttempts = () => { globalLoginAttempts = 0; };
 
 export const useLogin = () => {
   const router = useRouter();
@@ -26,7 +30,7 @@ export const useLogin = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [loadingMsg, setLoadingMsg] = useState("Verifying credentials…");
   const [error, setError] = useState<string | null>(null);
-  const [attempts, setAttempts] = useState(0);
+  const [attempts, setAttempts] = useState(globalLoginAttempts);
   const [bioVerified, setBioVerified] = useState(false);
   const [bioInfo, setBioInfo] = useState<BiometricInfo>({
     available: false,
@@ -38,31 +42,11 @@ export const useLogin = () => {
 
   const shake = useCallback(() => {
     Animated.sequence([
-      Animated.timing(shakeAnim, {
-        toValue: 10,
-        duration: 55,
-        useNativeDriver: true,
-      }),
-      Animated.timing(shakeAnim, {
-        toValue: -10,
-        duration: 55,
-        useNativeDriver: true,
-      }),
-      Animated.timing(shakeAnim, {
-        toValue: 7,
-        duration: 55,
-        useNativeDriver: true,
-      }),
-      Animated.timing(shakeAnim, {
-        toValue: -7,
-        duration: 55,
-        useNativeDriver: true,
-      }),
-      Animated.timing(shakeAnim, {
-        toValue: 0,
-        duration: 55,
-        useNativeDriver: true,
-      }),
+      Animated.timing(shakeAnim, { toValue: 10, duration: 55, useNativeDriver: true }),
+      Animated.timing(shakeAnim, { toValue: -10, duration: 55, useNativeDriver: true }),
+      Animated.timing(shakeAnim, { toValue: 7, duration: 55, useNativeDriver: true }),
+      Animated.timing(shakeAnim, { toValue: -7, duration: 55, useNativeDriver: true }),
+      Animated.timing(shakeAnim, { toValue: 0, duration: 55, useNativeDriver: true }),
     ]).start();
   }, [shakeAnim]);
 
@@ -70,7 +54,6 @@ export const useLogin = () => {
     void getBiometricInfo().then(setBioInfo);
   }, [getBiometricInfo]);
 
-  // Auto-logout if session expires (status drops to unauthenticated while on this screen)
   useEffect(() => {
     if (status === "unauthenticated") {
       setPassPhrase("");
@@ -116,17 +99,29 @@ export const useLogin = () => {
       : await login(passPhrase, passKey);
 
     if (success) {
+      globalLoginAttempts = 0;
       router.replace("/folders");
     } else {
-      const next = attempts + 1;
+      globalLoginAttempts += 1;
+      const next = globalLoginAttempts;
       setAttempts(next);
       setIsLoading(false);
       setPassKey("");
       setBioVerified(false);
+
+      if (next >= 3) {
+        setError(`Too many failed attempts. Closing app for security.`);
+        shake();
+        // Brief delay so user can read the message, then exit
+        setTimeout(() => {
+          BackHandler.exitApp();
+        }, 1800);
+        return;
+      }
+
+      const remaining = 3 - next;
       setError(
-        next >= 3
-          ? `${next} failed attempts. Double-check your credentials.`
-          : "Incorrect credentials. Try again.",
+        `Incorrect credentials. ${remaining} attempt${remaining === 1 ? "" : "s"} remaining.`,
       );
       shake();
     }
@@ -134,7 +129,6 @@ export const useLogin = () => {
     passKey,
     passPhrase,
     bioVerified,
-    attempts,
     login,
     loginWithBiometrics,
     router,
@@ -152,6 +146,7 @@ export const useLogin = () => {
     loadingMsg,
     error,
     setError,
+    attempts,
     bioVerified,
     bioInfo,
     isBiometricEnabled,

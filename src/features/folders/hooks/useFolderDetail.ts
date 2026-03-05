@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useState } from "react";
-import { Alert } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useFilesStore } from "@features/files/store/filesStore";
 import { useFoldersStore } from "@features/folders/store/foldersStore";
@@ -13,6 +12,13 @@ export const useFolderDetail = () => {
   const [openMoreOptionSheet, setMoreOptionVisibility] =
     useState<boolean>(false);
 
+  // Delete file dialog state
+  const [deleteFileId, setDeleteFileId] = useState<string | null>(null);
+  const [deleteFileDialogOpen, setDeleteFileDialogOpen] = useState(false);
+
+  // Delete folder dialog state
+  const [deleteFolderDialogOpen, setDeleteFolderDialogOpen] = useState(false);
+
   useEffect(() => {
     if (id) void loadFilesForFolder(id);
   }, [id]);
@@ -22,50 +28,29 @@ export const useFolderDetail = () => {
     [router],
   );
 
-  const onDeleteFile = useCallback(
-    (fileId: string) => {
-      Alert.alert("Delete File", "This action cannot be undone.", [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Delete",
-          style: "destructive",
-          onPress: () => void deleteFile(fileId, id),
-        },
-      ]);
-    },
-    [id, deleteFile],
-  );
+  const onDeleteFile = useCallback((fileId: string) => {
+    setDeleteFileId(fileId);
+    setDeleteFileDialogOpen(true);
+  }, []);
+
+  const onConfirmDeleteFile = useCallback(() => {
+    if (deleteFileId) {
+      void deleteFile(deleteFileId, id);
+    }
+    setDeleteFileDialogOpen(false);
+    setDeleteFileId(null);
+  }, [deleteFileId, id, deleteFile]);
+
+  const onConfirmDeleteFolder = useCallback(async () => {
+    setDeleteFolderDialogOpen(false);
+    setMoreOptionVisibility(false);
+    await useFoldersStore.getState().deleteFolder(id);
+    router.back();
+  }, [id, router]);
 
   const onMoreOptions = useCallback(() => {
-    Alert.alert(folder?.name ?? "Folder", undefined, [
-      {
-        text: "Edit Folder",
-        onPress: () =>
-          router.push({
-            pathname: "/modals/create-folder",
-            params: { editId: id },
-          }),
-      },
-      {
-        text: "Delete Folder",
-        style: "destructive",
-        onPress: () => {
-          Alert.alert("Delete Folder", "All files will be deleted too.", [
-            { text: "Cancel", style: "cancel" },
-            {
-              text: "Delete",
-              style: "destructive",
-              onPress: async () => {
-                await useFoldersStore.getState().deleteFolder(id);
-                router.back();
-              },
-            },
-          ]);
-        },
-      },
-      { text: "Cancel", style: "cancel" },
-    ]);
-  }, [folder, id, router]);
+    setMoreOptionVisibility(true);
+  }, []);
 
   return {
     folder,
@@ -81,11 +66,24 @@ export const useFolderDetail = () => {
         pathname: "/modals/create-file",
         params: { folderId: id },
       }),
-    onEditFolder: () =>
+    onEditFolder: () => {
+      setMoreOptionVisibility(false);
       router.push({
         pathname: "/modals/create-folder",
         params: { editId: id },
-      }),
-    onDeleteFolder: () => {},
+      });
+    },
+    onDeleteFolder: () => {
+      setMoreOptionVisibility(false);
+      setDeleteFolderDialogOpen(true);
+    },
+    // Delete file dialog
+    deleteFileDialogOpen,
+    setDeleteFileDialogOpen,
+    onConfirmDeleteFile,
+    // Delete folder dialog
+    deleteFolderDialogOpen,
+    setDeleteFolderDialogOpen,
+    onConfirmDeleteFolder,
   };
 };

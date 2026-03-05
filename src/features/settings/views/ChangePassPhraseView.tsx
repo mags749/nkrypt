@@ -19,6 +19,7 @@ interface ChangePassPhraseViewProps {
   onToggleShow: () => void;
   isLoading: boolean;
   error: string | null;
+  verifyAttempts: number;
   primaryLabel: string;
   onPrimary: () => void;
   onBack: () => void;
@@ -44,6 +45,7 @@ export const ChangePassPhraseView = ({
   onToggleShow,
   isLoading,
   error,
+  verifyAttempts,
   primaryLabel,
   onPrimary,
   onBack,
@@ -54,7 +56,7 @@ export const ChangePassPhraseView = ({
       style={{ flex: 1, backgroundColor: colors.background }}
       edges={["top", "bottom"]}
     >
-      <LoadingOverlay visible={isLoading} message="Updating Pass Phrase…" />
+      <LoadingOverlay visible={isLoading} message="Verifying…" />
       <ScreenHeader title={STEP_TITLES[step]} onBack={onBack} />
 
       <XStack
@@ -112,6 +114,13 @@ export const ChangePassPhraseView = ({
             />
           </XStack>
         </View>
+
+        {/* Show attempt counter warning on the verify step */}
+        {step === "verify" && verifyAttempts > 0 && verifyAttempts < 3 && (
+          <Text color={colors.error} fontSize={12} textAlign="center" fontWeight="600">
+            ⚠️ {3 - verifyAttempts} attempt{3 - verifyAttempts === 1 ? "" : "s"} remaining before app exits
+          </Text>
+        )}
       </YStack>
 
       <YStack
@@ -123,7 +132,9 @@ export const ChangePassPhraseView = ({
           label={primaryLabel}
           onPress={onPrimary}
           loading={isLoading}
+          loadingLabel={step === "verify" ? "Verifying…" : undefined}
           fullWidth
+          disabled={step === "verify" && verifyAttempts >= 3}
         />
       </YStack>
     </SafeAreaView>

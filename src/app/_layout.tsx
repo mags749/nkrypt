@@ -76,20 +76,27 @@ export default function RootLayout() {
             <Stack.Screen
               name="modals/create-folder"
               options={{
+                // Transparent so the BlurView can capture the background screen
                 presentation: "transparentModal",
-                animation: "slide_from_bottom",
+                animation: "fade",
+                contentStyle: { backgroundColor: "transparent" },
               }}
             />
             <Stack.Screen
               name="modals/create-file"
               options={{
                 presentation: "transparentModal",
-                animation: "slide_from_bottom",
+                animation: "fade",
+                contentStyle: { backgroundColor: "transparent" },
               }}
             />
             <Stack.Screen
               name="modals/passkey-prompt"
-              options={{ presentation: "transparentModal", animation: "fade" }}
+              options={{
+                presentation: "transparentModal",
+                animation: "fade",
+                contentStyle: { backgroundColor: "transparent" },
+              }}
             />
           </Stack>
         </SafeAreaProvider>

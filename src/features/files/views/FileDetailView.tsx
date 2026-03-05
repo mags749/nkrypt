@@ -1,4 +1,5 @@
 import React from "react";
+import { Linking } from "react-native";
 import { ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Text, View, XStack } from "tamagui";
@@ -26,6 +27,16 @@ interface FileDetailViewProps {
   onCopyUsername: () => void;
   onCopyField: (value: string) => void;
 }
+
+const openSiteUrl = (site: string) => {
+  let url = site.trim();
+  if (!url) return;
+  // Add protocol if missing
+  if (!/^https?:\/\//i.test(url)) {
+    url = `https://${url}`;
+  }
+  void Linking.openURL(url);
+};
 
 export const FileDetailView = ({
   file,
@@ -81,7 +92,7 @@ export const FileDetailView = ({
           label="Site"
           value={file.site}
           onCopy={() => onCopyField(file.site)}
-          onOpen={() => {}}
+          onOpen={() => openSiteUrl(file.site)}
         />
         <View height={1} backgroundColor={colors.separator} />
 

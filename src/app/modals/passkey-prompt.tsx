@@ -18,6 +18,9 @@ export default function PassKeyPromptModal() {
         void hook.onConfirm();
       }}
       onDismiss={hook.onDismiss}
+      toastVisible={hook.toastVisible}
+      toastMessage={hook.toastMessage}
+      attemptCount={hook.attemptCount}
     />
   );
 }

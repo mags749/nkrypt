@@ -1,11 +1,17 @@
 import React from "react";
 import { Text, View, XStack, YStack } from "tamagui";
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+} from "react-native-reanimated";
 
 import { useColors } from "@context/providers/themeStore";
 import { BlurModal } from "@shared/components/BlurModal";
 import { PassKeyInput } from "@shared/components/PassKeyInput";
 import { Button } from "@shared/components/ui";
-import { Spacing } from "@shared/constants/design";
+import { Spacing, Radius } from "@shared/constants/design";
+import { useEffect } from "react";
 
 interface PassKeyPromptViewProps {
   mode?: "copy" | "reveal" | "copy-username";
@@ -15,6 +21,9 @@ interface PassKeyPromptViewProps {
   isLoading: boolean;
   onConfirm: () => void;
   onDismiss: () => void;
+  toastVisible: boolean;
+  toastMessage: string;
+  attemptCount: number;
 }
 
 export const PassKeyPromptView = ({
@@ -25,6 +34,9 @@ export const PassKeyPromptView = ({
   isLoading,
   onConfirm,
   onDismiss,
+  toastVisible,
+  toastMessage,
+  attemptCount,
 }: PassKeyPromptViewProps) => {
   const colors = useColors();
   const modeLabel =
@@ -35,6 +47,26 @@ export const PassKeyPromptView = ({
       : mode === "copy-username"
         ? "Enter your Pass Key to copy the username."
         : "Enter your Pass Key to reveal the credentials.";
+
+  const toastOpacity = useSharedValue(0);
+  const toastTranslateY = useSharedValue(20);
+
+  useEffect(() => {
+    if (toastVisible) {
+      toastOpacity.value = withTiming(1, { duration: 200 });
+      toastTranslateY.value = withTiming(0, { duration: 200 });
+    } else {
+      toastOpacity.value = withTiming(0, { duration: 300 });
+      toastTranslateY.value = withTiming(20, { duration: 300 });
+    }
+  }, [toastVisible]);
+
+  const toastStyle = useAnimatedStyle(() => ({
+    opacity: toastOpacity.value,
+    transform: [{ translateY: toastTranslateY.value }],
+  }));
+
+  const isLastAttemptWarning = attemptCount === 2;
 
   return (
     <BlurModal visible onDismiss={onDismiss} position="flex-end">
@@ -59,6 +91,11 @@ export const PassKeyPromptView = ({
             {error}
           </Text>
         )}
+        {isLastAttemptWarning && !error && (
+          <Text color={colors.error} fontSize={12} textAlign="center" fontWeight="600">
+            ⚠️ Last attempt before logout
+          </Text>
+        )}
       </YStack>
 
       <XStack
@@ -81,10 +118,48 @@ export const PassKeyPromptView = ({
           label={modeLabel}
           onPress={onConfirm}
           loading={isLoading}
-          loadingLabel="Decrypting…"
+          loadingLabel="Verifying…"
           size="md"
         />
       </XStack>
+
+      {/* Toast notification */}
+      <Animated.View
+        style={[
+          toastStyle,
+          {
+            position: "absolute",
+            bottom: -16,
+            left: 0,
+            right: 0,
+            alignItems: "center",
+            pointerEvents: "none",
+          },
+        ]}
+      >
+        <View
+          backgroundColor={attemptCount >= 3 ? colors.error : colors.surfaceElevated}
+          paddingHorizontal={Spacing.lg}
+          paddingVertical={Spacing.sm}
+          borderRadius={Radius.full}
+          maxWidth="90%"
+          style={{
+            shadowColor: "#000",
+            shadowOpacity: 0.15,
+            shadowRadius: 8,
+            shadowOffset: { width: 0, height: 2 },
+          }}
+        >
+          <Text
+            fontSize={13}
+            fontWeight="600"
+            color={attemptCount >= 3 ? "#fff" : colors.textPrimary}
+            textAlign="center"
+          >
+            {toastMessage}
+          </Text>
+        </View>
+      </Animated.View>
     </BlurModal>
   );
 };

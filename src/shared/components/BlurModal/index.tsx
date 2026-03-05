@@ -1,9 +1,17 @@
 import React from "react";
-import { KeyboardAvoidingView, Platform } from "react-native";
-import { Dialog } from "tamagui";
+import { KeyboardAvoidingView, Modal, Platform, StyleSheet, View } from "react-native";
+import { BlurView } from "expo-blur";
 
 import { Radius, Spacing } from "@shared/constants/design";
 import { useColors } from "@context/providers/themeStore";
+import { useThemeStore } from "@context/providers/themeStore";
+
+interface BlurModalProps {
+  visible: boolean;
+  onDismiss: () => void;
+  children: React.ReactNode;
+  position?: "flex-end" | "center";
+}
 
 export const BlurModal = ({
   visible,
@@ -12,56 +20,90 @@ export const BlurModal = ({
   position = "flex-end",
 }: BlurModalProps) => {
   const colors = useColors();
+  const isDark = useThemeStore((s) => s.isDark);
 
   return (
-    <Dialog
-      modal={false}
-      open={visible}
-      onOpenChange={(open) => !open && onDismiss()}
+    <Modal
+      visible={visible}
+      transparent
+      animationType="fade"
+      onRequestClose={onDismiss}
+      statusBarTranslucent
     >
-      <Dialog.Portal>
-        <Dialog.Overlay
-          backgroundColor="rgba(0,0,0,0.5)" // Semi-transparent black
-          opacity={0.2}
-          animateOnly={["transform", "opacity"]}
-          transition={[
-            "fast",
-            {
-              opacity: {
-                overshootClamping: true,
-              },
-            },
-          ]}
-          enterStyle={{ opacity: 0 }}
-          exitStyle={{ opacity: 0 }}
-        />
+      {/* Full-screen BlurView behind everything */}
+      <BlurView
+        style={StyleSheet.absoluteFill}
+        intensity={50}
+        tint={isDark ? "dark" : "light"}
+        experimentalBlurMethod="dimezisBlurView"
+      />
 
-        <Dialog.Content
-          bordered
-          elevate
-          key="content"
-          transition="fast"
-          enterStyle={{ opacity: 0, scale: 0.95, y: 10 }}
-          exitStyle={{ opacity: 0, scale: 0.95, y: 10 }}
-          // Layout styling
-          background={colors.background}
-          br={Radius.xl}
-          p={Spacing["2xl"]}
-          width="90%"
-          maxWidth={450}
-          alignSelf="center"
-          style={{
-            marginBottom: position === "flex-end" ? Spacing["3xl"] : "auto",
-          }}
+      {/* Semi-transparent dark scrim on top of blur */}
+      <View
+        style={[
+          StyleSheet.absoluteFill,
+          { backgroundColor: isDark ? "rgba(0,0,0,0.45)" : "rgba(0,0,0,0.25)" },
+        ]}
+      />
+
+      {/* Dismiss tap area */}
+      <View
+        style={[styles.backdrop]}
+        onTouchEnd={(e) => {
+          // Only dismiss if tapping the backdrop directly (not the card)
+          if (e.target === e.currentTarget) onDismiss();
+        }}
+      >
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          style={[
+            styles.positioner,
+            position === "flex-end" ? styles.bottom : styles.center,
+          ]}
+          pointerEvents="box-none"
         >
-          <KeyboardAvoidingView
-            behavior={Platform.OS === "ios" ? "padding" : "height"}
-            style={{ width: "100%" }}
+          <View
+            style={[
+              styles.card,
+              { backgroundColor: colors.surfaceElevated },
+            ]}
           >
             {children}
-          </KeyboardAvoidingView>
-        </Dialog.Content>
-      </Dialog.Portal>
-    </Dialog>
+          </View>
+        </KeyboardAvoidingView>
+      </View>
+    </Modal>
   );
 };
+
+const styles = StyleSheet.create({
+  backdrop: {
+    flex: 1,
+  },
+  positioner: {
+    width: "100%",
+    alignItems: "center",
+  },
+  bottom: {
+    justifyContent: "flex-end",
+    marginTop: "auto",
+  },
+  center: {
+    justifyContent: "center",
+    flex: 1,
+  },
+  card: {
+    width: "90%",
+    maxWidth: 450,
+    borderRadius: Radius.xl,
+    padding: Spacing["2xl"],
+    // Bottom spacing when anchored to bottom
+    marginBottom: Spacing["3xl"],
+    // Shadow
+    shadowColor: "#000",
+    shadowOpacity: 0.2,
+    shadowRadius: 24,
+    shadowOffset: { width: 0, height: -4 },
+    elevation: 20,
+  },
+});

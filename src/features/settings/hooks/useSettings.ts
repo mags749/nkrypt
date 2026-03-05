@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { Alert } from "react-native";
 import { useRouter } from "expo-router";
 import {
   useAuthStore,
@@ -27,6 +26,11 @@ export const useSettings = () => {
     types: [],
   });
 
+  // Dialog state
+  const [lockDialogOpen, setLockDialogOpen] = useState(false);
+  const [wipeDialogOpen, setWipeDialogOpen] = useState(false);
+  const [biometricErrorVisible, setBiometricErrorVisible] = useState(false);
+
   useEffect(() => {
     void getBiometricInfo().then(setBioInfo);
   }, [getBiometricInfo]);
@@ -36,48 +40,28 @@ export const useSettings = () => {
       await disableBiometrics();
     } else {
       const ok = await enableBiometrics();
-      if (!ok)
-        Alert.alert("Biometrics Failed", "Could not enable biometric unlock.");
+      if (!ok) setBiometricErrorVisible(true);
     }
   };
 
-  const onLockVault = () => {
-    Alert.alert(
-      "Lock Vault",
-      "You will be returned to the login screen. Your data remains encrypted.",
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Lock",
-          onPress: () => {
-            logout();
-            router.replace("/auth");
-          },
-        },
-      ],
-    );
+  const onLockVault = () => setLockDialogOpen(true);
+
+  const onConfirmLock = () => {
+    setLockDialogOpen(false);
+    logout();
+    router.replace("/auth");
   };
 
-  const onWipeData = () => {
-    Alert.alert(
-      "Wipe All Data",
-      "This permanently deletes ALL folders, files, and credentials. Cannot be undone.",
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Wipe Everything",
-          style: "destructive",
-          onPress: async () => {
-            setLoadingMsg("Wiping data…");
-            setIsLoading(true);
-            await new Promise<void>((r) => setTimeout(r, 600));
-            logout();
-            setIsLoading(false);
-            router.replace("/auth/setup");
-          },
-        },
-      ],
-    );
+  const onWipeData = () => setWipeDialogOpen(true);
+
+  const onConfirmWipe = async () => {
+    setWipeDialogOpen(false);
+    setLoadingMsg("Wiping data…");
+    setIsLoading(true);
+    await new Promise<void>((r) => setTimeout(r, 600));
+    logout();
+    setIsLoading(false);
+    router.replace("/auth/setup");
   };
 
   return {
@@ -95,5 +79,14 @@ export const useSettings = () => {
     onCategories: () => router.push("/settings/categories"),
     onEula: () => router.push("/auth/eula"),
     onBack: () => router.back(),
+    // Dialog state
+    lockDialogOpen,
+    setLockDialogOpen,
+    onConfirmLock,
+    wipeDialogOpen,
+    setWipeDialogOpen,
+    onConfirmWipe,
+    biometricErrorVisible,
+    setBiometricErrorVisible,
   };
 };
