@@ -1,7 +1,7 @@
 import React from "react";
 import { ScrollView, Switch } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { AlertDialog, Text, View, XStack, YStack } from "tamagui";
+import { Text, View, XStack } from "tamagui";
 
 import { useColors } from "@context/providers/themeStore";
 import { type BiometricInfo } from "@features/auth/store/authStore";
@@ -10,8 +10,8 @@ import { SectionGroup } from "@features/settings/views/SectionGroup";
 import { SettingRow } from "@features/settings/views/SettingRow";
 import { BxIcon } from "@shared/components/BxIcon";
 import { LoadingOverlay } from "@shared/components/ui/LoadingOverlay";
-import { Button } from "@shared/components/ui";
 import { Spacing } from "@shared/constants/design";
+import { ConfirmDialog } from "@shared/components/ConfirmDialog";
 
 interface SettingsViewProps {
   isDark: boolean;
@@ -28,7 +28,6 @@ interface SettingsViewProps {
   onEula: () => void;
   onWipeData: () => void;
   onBack: () => void;
-  // Dialog state
   lockDialogOpen: boolean;
   setLockDialogOpen: (open: boolean) => void;
   onConfirmLock: () => void;
@@ -120,8 +119,8 @@ export const SettingsView = ({
         <SectionGroup title="Security">
           <SettingRow
             icon="bx-hash"
-            label="Change PIN"
-            sublabel="Numeric PIN used for login verification"
+            label="Change Pass Phrase"
+            sublabel="Pass Phrase used for login verification"
             onPress={onChangePin}
           />
           <RowDivider />
@@ -205,124 +204,39 @@ export const SettingsView = ({
       </ScrollView>
 
       {/* Lock Vault confirmation */}
-      <AlertDialog open={lockDialogOpen} onOpenChange={setLockDialogOpen}>
-        <AlertDialog.Portal>
-          <AlertDialog.Overlay
-            key="overlay"
-            animation="quick"
-            opacity={0.5}
-            enterStyle={{ opacity: 0 }}
-            exitStyle={{ opacity: 0 }}
-          />
-          <AlertDialog.Content
-            key="content"
-            animation="quick"
-            enterStyle={{ opacity: 0, scale: 0.95 }}
-            exitStyle={{ opacity: 0, scale: 0.95 }}
-            backgroundColor={colors.surfaceElevated}
-            borderRadius={16}
-            padding={Spacing["2xl"]}
-            maxWidth={340}
-            width="90%"
-          >
-            <YStack gap={Spacing.md}>
-              <AlertDialog.Title color={colors.textPrimary} fontSize={18} fontWeight="700">
-                Lock Vault
-              </AlertDialog.Title>
-              <AlertDialog.Description color={colors.textSecondary} fontSize={14}>
-                You will be returned to the login screen. Your data remains encrypted.
-              </AlertDialog.Description>
-              <XStack gap={Spacing.md} justifyContent="flex-end" marginTop={Spacing.sm}>
-                <AlertDialog.Cancel asChild>
-                  <Button label="Cancel" variant="ghost" size="sm" onPress={() => setLockDialogOpen(false)} />
-                </AlertDialog.Cancel>
-                <AlertDialog.Action asChild>
-                  <Button label="Lock" size="sm" onPress={onConfirmLock} />
-                </AlertDialog.Action>
-              </XStack>
-            </YStack>
-          </AlertDialog.Content>
-        </AlertDialog.Portal>
-      </AlertDialog>
+      <ConfirmDialog
+        open={lockDialogOpen}
+        onOpenChange={setLockDialogOpen}
+        title="Lock Vault"
+        description="You will be returned to the login screen. Your data remains encrypted."
+        confirmLabel="Lock"
+        cancelLabel="Cancel"
+        onConfirm={onConfirmLock}
+        onCancel={() => setLockDialogOpen(false)}
+      />
 
       {/* Wipe All Data confirmation */}
-      <AlertDialog open={wipeDialogOpen} onOpenChange={setWipeDialogOpen}>
-        <AlertDialog.Portal>
-          <AlertDialog.Overlay
-            key="overlay"
-            animation="quick"
-            opacity={0.5}
-            enterStyle={{ opacity: 0 }}
-            exitStyle={{ opacity: 0 }}
-          />
-          <AlertDialog.Content
-            key="content"
-            animation="quick"
-            enterStyle={{ opacity: 0, scale: 0.95 }}
-            exitStyle={{ opacity: 0, scale: 0.95 }}
-            backgroundColor={colors.surfaceElevated}
-            borderRadius={16}
-            padding={Spacing["2xl"]}
-            maxWidth={340}
-            width="90%"
-          >
-            <YStack gap={Spacing.md}>
-              <AlertDialog.Title color={colors.error} fontSize={18} fontWeight="700">
-                Wipe All Data
-              </AlertDialog.Title>
-              <AlertDialog.Description color={colors.textSecondary} fontSize={14}>
-                This permanently deletes ALL folders, files, and credentials. Cannot be undone.
-              </AlertDialog.Description>
-              <XStack gap={Spacing.md} justifyContent="flex-end" marginTop={Spacing.sm}>
-                <AlertDialog.Cancel asChild>
-                  <Button label="Cancel" variant="ghost" size="sm" onPress={() => setWipeDialogOpen(false)} />
-                </AlertDialog.Cancel>
-                <AlertDialog.Action asChild>
-                  <Button label="Wipe Everything" variant="danger" size="sm" onPress={() => void onConfirmWipe()} />
-                </AlertDialog.Action>
-              </XStack>
-            </YStack>
-          </AlertDialog.Content>
-        </AlertDialog.Portal>
-      </AlertDialog>
+      <ConfirmDialog
+        open={wipeDialogOpen}
+        onOpenChange={setWipeDialogOpen}
+        title="Wipe All Data"
+        description="This permanently deletes ALL folders, files, and credentials. Cannot be undone."
+        confirmLabel="Wipe Everything"
+        cancelLabel="Cancel"
+        variant="danger"
+        onConfirm={() => void onConfirmWipe()}
+        onCancel={() => setWipeDialogOpen(false)}
+      />
 
       {/* Biometric error */}
-      <AlertDialog open={biometricErrorVisible} onOpenChange={setBiometricErrorVisible}>
-        <AlertDialog.Portal>
-          <AlertDialog.Overlay
-            key="overlay"
-            animation="quick"
-            opacity={0.5}
-            enterStyle={{ opacity: 0 }}
-            exitStyle={{ opacity: 0 }}
-          />
-          <AlertDialog.Content
-            key="content"
-            animation="quick"
-            enterStyle={{ opacity: 0, scale: 0.95 }}
-            exitStyle={{ opacity: 0, scale: 0.95 }}
-            backgroundColor={colors.surfaceElevated}
-            borderRadius={16}
-            padding={Spacing["2xl"]}
-            maxWidth={340}
-            width="90%"
-          >
-            <YStack gap={Spacing.md}>
-              <AlertDialog.Title color={colors.textPrimary} fontSize={18} fontWeight="700">
-                Biometrics Failed
-              </AlertDialog.Title>
-              <AlertDialog.Description color={colors.textSecondary} fontSize={14}>
-                Could not enable biometric unlock. Please try again.
-              </AlertDialog.Description>
-              <XStack justifyContent="flex-end" marginTop={Spacing.sm}>
-                <AlertDialog.Action asChild>
-                  <Button label="OK" size="sm" onPress={() => setBiometricErrorVisible(false)} />
-                </AlertDialog.Action>
-              </XStack>
-            </YStack>
-          </AlertDialog.Content>
-        </AlertDialog.Portal>
-      </AlertDialog>
+      <ConfirmDialog
+        open={biometricErrorVisible}
+        onOpenChange={setBiometricErrorVisible}
+        title="Biometrics Failed"
+        description="Could not enable biometric unlock. Please try again."
+        confirmLabel="OK"
+        onConfirm={() => setBiometricErrorVisible(false)}
+      />
     </SafeAreaView>
   );
 };

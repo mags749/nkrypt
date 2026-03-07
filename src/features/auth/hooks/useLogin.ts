@@ -10,7 +10,9 @@ import { PASSKEY_MIN_LENGTH } from "@shared/components/PassKeyInput";
 
 // Shared global attempt counter — persists across re-renders, resets on success
 let globalLoginAttempts = 0;
-export const resetLoginAttempts = () => { globalLoginAttempts = 0; };
+export const resetLoginAttempts = () => {
+  globalLoginAttempts = 0;
+};
 
 export const useLogin = () => {
   const router = useRouter();
@@ -42,11 +44,31 @@ export const useLogin = () => {
 
   const shake = useCallback(() => {
     Animated.sequence([
-      Animated.timing(shakeAnim, { toValue: 10, duration: 55, useNativeDriver: true }),
-      Animated.timing(shakeAnim, { toValue: -10, duration: 55, useNativeDriver: true }),
-      Animated.timing(shakeAnim, { toValue: 7, duration: 55, useNativeDriver: true }),
-      Animated.timing(shakeAnim, { toValue: -7, duration: 55, useNativeDriver: true }),
-      Animated.timing(shakeAnim, { toValue: 0, duration: 55, useNativeDriver: true }),
+      Animated.timing(shakeAnim, {
+        toValue: 10,
+        duration: 55,
+        useNativeDriver: true,
+      }),
+      Animated.timing(shakeAnim, {
+        toValue: -10,
+        duration: 55,
+        useNativeDriver: true,
+      }),
+      Animated.timing(shakeAnim, {
+        toValue: 7,
+        duration: 55,
+        useNativeDriver: true,
+      }),
+      Animated.timing(shakeAnim, {
+        toValue: -7,
+        duration: 55,
+        useNativeDriver: true,
+      }),
+      Animated.timing(shakeAnim, {
+        toValue: 0,
+        duration: 55,
+        useNativeDriver: true,
+      }),
     ]).start();
   }, [shakeAnim]);
 

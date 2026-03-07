@@ -24,16 +24,21 @@ export const folders = sqliteTable("folders", {
 });
 
 // ─── Files ────────────────────────────────────────────────────────────────────
+// Each file is a single key/value entry.
+// If isEncrypted=1, the value column stores an AES-256-CTR hex cipher text.
+// If isLink=1, the (decrypted) value is treated as a URL.
 
 export const files = sqliteTable("files", {
   id: text("id").primaryKey(),
   folderId: text("folder_id")
     .notNull()
     .references(() => folders.id, { onDelete: "cascade" }),
-  site: text("site").notNull(),
-  username: text("username").notNull().default(""), // kept for legacy rows; use encryptedUsername going forward
-  encryptedUsername: text("encrypted_username").notNull().default(""), // AES-256-CTR hex
-  encryptedCredentials: text("encrypted_credentials").notNull(), // AES-256-CTR hex
+  key: text("key").notNull(),
+  value: text("value").notNull(), // plaintext OR AES-256-CTR hex
+  isEncrypted: integer("is_encrypted", { mode: "boolean" })
+    .notNull()
+    .default(true),
+  isLink: integer("is_link", { mode: "boolean" }).notNull().default(false),
   createdAt: integer("created_at", { mode: "timestamp_ms" }).notNull(),
   updatedAt: integer("updated_at", { mode: "timestamp_ms" }).notNull(),
 });

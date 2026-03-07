@@ -103,11 +103,15 @@ export const ChangePassKeyView = ({
               {errors.general}
             </Text>
           )}
-          {step === "verify" && verifyAttempts > 0 && verifyAttempts < 3 && !errors.general && (
-            <Text color={colors.error} fontSize={12} textAlign="center">
-              {3 - verifyAttempts} attempt{3 - verifyAttempts === 1 ? "" : "s"} remaining before app exit
-            </Text>
-          )}
+          {step === "verify" &&
+            verifyAttempts > 0 &&
+            verifyAttempts < 3 &&
+            !errors.general && (
+              <Text color={colors.error} fontSize={12} textAlign="center">
+                {3 - verifyAttempts} attempt
+                {3 - verifyAttempts === 1 ? "" : "s"} remaining before app exit
+              </Text>
+            )}
         </ScrollView>
         <YStack
           padding={Spacing["2xl"]}

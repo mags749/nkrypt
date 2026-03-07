@@ -4,6 +4,7 @@ import { create } from "zustand";
 import { db } from "@infra/database/client";
 import { settings } from "@infra/database/schema";
 import { hashForStorage, verifyHash } from "@infra/crypto/cryptoService";
+import { BackHandler } from "react-native";
 
 // ─── Setting keys ─────────────────────────────────────────────────────────────
 
@@ -247,7 +248,10 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   },
 
   // ── logout ─────────────────────────────────────────────────────────────────
-  logout: () => set({ status: "unauthenticated", passKey: null }),
+  logout: () => {
+    set({ status: "unauthenticated", passKey: null });
+    BackHandler.exitApp();
+  },
   getPassKey: () => get().passKey,
 
   // ── changePassPhrase ───────────────────────────────────────────────────────

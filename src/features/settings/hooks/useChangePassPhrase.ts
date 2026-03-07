@@ -36,7 +36,9 @@ export const useChangePassPhrase = () => {
 
     const rows = await db.select().from(settings);
     const map: Record<string, string> = {};
-    rows.forEach((r) => { map[r.key] = r.value; });
+    rows.forEach((r) => {
+      map[r.key] = r.value;
+    });
 
     const phraseOk = verifyHash(oldPhrase, map["passphrase_hash"] ?? "");
     setIsLoading(false);

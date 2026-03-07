@@ -117,8 +117,14 @@ export const ChangePassPhraseView = ({
 
         {/* Show attempt counter warning on the verify step */}
         {step === "verify" && verifyAttempts > 0 && verifyAttempts < 3 && (
-          <Text color={colors.error} fontSize={12} textAlign="center" fontWeight="600">
-            ⚠️ {3 - verifyAttempts} attempt{3 - verifyAttempts === 1 ? "" : "s"} remaining before app exits
+          <Text
+            color={colors.error}
+            fontSize={12}
+            textAlign="center"
+            fontWeight="600"
+          >
+            ⚠️ {3 - verifyAttempts} attempt{3 - verifyAttempts === 1 ? "" : "s"}{" "}
+            remaining before app exits
           </Text>
         )}
       </YStack>

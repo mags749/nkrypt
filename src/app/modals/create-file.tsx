@@ -7,28 +7,19 @@ export default function CreateFileModal() {
   return (
     <CreateFileView
       isEditing={hook.isEditing}
-      site={hook.site}
-      onSiteChange={(v) => {
-        hook.setSite(v);
-        hook.clearErr("site");
-      }}
-      username={hook.username}
-      onUsernameChange={(v) => {
-        hook.setUsername(v);
-        hook.clearErr("username");
-      }}
-      credentials={hook.credentials}
-      onCredentialsChange={(v) => {
-        hook.setCredentials(v);
-        hook.clearErr("credentials");
-      }}
-      showCreds={hook.showCreds}
-      onToggleCreds={() => hook.setShowCreds((v) => !v)}
+      fileKey={hook.key}
+      onKeyChange={hook.setKey}
+      value={hook.value}
+      onValueChange={hook.setValue}
+      isEncrypted={hook.isEncrypted}
+      onEncryptedChange={hook.setIsEncrypted}
+      isLink={hook.isLink}
+      onLinkChange={hook.setIsLink}
+      showValue={hook.showValue}
+      onToggleShowValue={() => hook.setShowValue((v) => !v)}
       isLoading={hook.isLoading}
       errors={hook.errors}
-      onSave={() => {
-        void hook.onSave();
-      }}
+      onSave={() => void hook.onSave()}
       onClose={hook.onClose}
     />
   );

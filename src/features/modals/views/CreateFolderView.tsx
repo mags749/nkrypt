@@ -1,5 +1,5 @@
 import React from "react";
-import { Text, View, XStack, YStack } from "tamagui";
+import { Text, XStack, YStack } from "tamagui";
 
 import { useColors } from "@context/providers/themeStore";
 import { BxIcon } from "@shared/components/BxIcon";
@@ -38,6 +38,7 @@ export const CreateFolderView = ({
   onClose,
 }: CreateFolderViewProps) => {
   const colors = useColors();
+
   return (
     <BlurModal visible onDismiss={onClose} position="flex-end">
       <LoadingOverlay

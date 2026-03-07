@@ -9,8 +9,9 @@ export const useCreateFile = () => {
     folderId?: string;
     editId?: string;
   }>();
-  const { createFile, updateFile, filesByFolder, decryptFileUsername } =
+  const { createFile, updateFile, filesByFolder, decryptFileValue } =
     useFilesStore();
+
   const editFile = editId
     ? Object.values(filesByFolder)
         .flat()
@@ -18,41 +19,44 @@ export const useCreateFile = () => {
     : undefined;
   const isEditing = Boolean(editFile);
 
-  // Pre-fill username for edit: decrypt using session passkey
-  const getInitialUsername = () => {
+  // Pre-fill value for edit: decrypt if needed
+  const getInitialValue = () => {
     if (!editFile) return "";
+    if (!editFile.isEncrypted) return editFile.value;
     const passKey = useAuthStore.getState().getPassKey();
     if (!passKey) return "";
-    return decryptFileUsername(editFile, passKey) ?? "";
+    return decryptFileValue(editFile, passKey) ?? "";
   };
 
-  const [site, setSite] = useState(editFile?.site ?? "");
-  const [username, setUsername] = useState(() => getInitialUsername());
-  const [credentials, setCredentials] = useState("");
-  const [showCreds, setShowCreds] = useState(false);
+  const [key, setKey] = useState(editFile?.key ?? "");
+  const [value, setValue] = useState(() => getInitialValue());
+  const [isEncrypted, setIsEncrypted] = useState(
+    editFile ? editFile.isEncrypted : true,
+  );
+  const [isLink, setIsLink] = useState(editFile?.isLink ?? false);
+  const [showValue, setShowValue] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const clearErr = (k: string) => setErrors((p) => ({ ...p, [k]: "" }));
-
   const onSave = async () => {
     const e: Record<string, string> = {};
-    if (!site.trim()) e.site = "Site is required";
-    if (!username.trim()) e.username = "Username is required";
-    if (!isEditing && !credentials.trim())
-      e.credentials = "Credentials are required";
+    if (!key.trim()) e.key = "Key is required";
+    if (!isEditing && !value.trim()) e.value = "Value is required";
     setErrors(e);
     if (Object.keys(e).length > 0) return;
+
     setIsLoading(true);
     try {
-      if (isEditing && editId)
+      if (isEditing && editId) {
         await updateFile(editId, {
-          site,
-          username,
-          ...(credentials.trim() ? { credentials } : {}),
+          key,
+          ...(value.trim() ? { value } : {}),
+          isEncrypted,
+          isLink,
         });
-      else if (folderId)
-        await createFile({ folderId, site, username, credentials });
+      } else if (folderId) {
+        await createFile({ folderId, key, value, isEncrypted, isLink });
+      }
       router.back();
     } catch (err) {
       setErrors({
@@ -63,18 +67,19 @@ export const useCreateFile = () => {
   };
 
   return {
-    site,
-    setSite,
-    username,
-    setUsername,
-    credentials,
-    setCredentials,
-    showCreds,
-    setShowCreds,
+    key,
+    setKey,
+    value,
+    setValue,
+    isEncrypted,
+    setIsEncrypted,
+    isLink,
+    setIsLink,
+    showValue,
+    setShowValue,
     isLoading,
     errors,
     isEditing,
-    clearErr,
     onSave,
     onClose: () => router.back(),
   };

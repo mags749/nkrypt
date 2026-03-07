@@ -1,6 +1,6 @@
-import React, { useEffect, useRef } from "react";
-import { ActivityIndicator, Animated, Modal } from "react-native";
-import { Text, View, XStack, YStack } from "tamagui";
+import React from "react";
+import { ActivityIndicator } from "react-native";
+import { Dialog, Text, YStack } from "tamagui";
 
 import { useColors } from "@context/providers/themeStore";
 import { Radius, Shadow, Spacing } from "@shared/constants/design";
@@ -15,71 +15,39 @@ export const LoadingOverlay = ({
   message = "Processing…",
 }: LoadingOverlayProps) => {
   const colors = useColors();
-  const fadeAnim = useRef(new Animated.Value(0)).current;
-  const scaleAnim = useRef(new Animated.Value(0.92)).current;
-
-  useEffect(() => {
-    if (visible) {
-      Animated.parallel([
-        Animated.timing(fadeAnim, {
-          toValue: 1,
-          duration: 180,
-          useNativeDriver: true,
-        }),
-        Animated.spring(scaleAnim, {
-          toValue: 1,
-          tension: 80,
-          friction: 10,
-          useNativeDriver: true,
-        }),
-      ]).start();
-    } else {
-      Animated.timing(fadeAnim, {
-        toValue: 0,
-        duration: 150,
-        useNativeDriver: true,
-      }).start();
-    }
-  }, [visible, fadeAnim, scaleAnim]);
-
-  if (!visible) return null;
 
   return (
-    <Modal
-      transparent
-      animationType="none"
-      visible={visible}
-      statusBarTranslucent
-    >
-      <Animated.View
-        style={{
-          flex: 1,
-          backgroundColor: "rgba(0,0,0,0.45)",
-          alignItems: "center",
-          justifyContent: "center",
-          opacity: fadeAnim,
-        }}
-      >
-        <Animated.View
-          style={{
-            borderRadius: Radius.xl,
-            paddingVertical: Spacing["3xl"],
-            paddingHorizontal: Spacing["4xl"],
-            alignItems: "center",
-            gap: Spacing.lg,
-            minWidth: 160,
-            backgroundColor: colors.surface,
-            ...Shadow.xl,
-            transform: [{ scale: scaleAnim }],
-          }}
+    <Dialog open={visible} modal>
+      <Dialog.Portal>
+        <Dialog.Overlay
+          transition="fast"
+          enterStyle={{ opacity: 0 }}
+          exitStyle={{ opacity: 0 }}
+          backgroundColor="rgba(0,0,0,0.45)"
+        />
+        <Dialog.Content
+          transition="fast"
+          enterStyle={{ opacity: 0, scale: 0.92 }}
+          exitStyle={{ opacity: 0, scale: 0.92 }}
+          backgroundColor={colors.surface}
+          borderRadius={Radius.xl}
+          paddingVertical={Spacing["3xl"]}
+          paddingHorizontal={Spacing["4xl"]}
+          alignItems="center"
+          minWidth={160}
+          unstyled
+          elevate
+          style={Shadow.xl}
         >
-          <ActivityIndicator size="large" color={colors.textPrimary} />
-          <Text color={colors.textSecondary} fontSize={15} textAlign="center">
-            {message}
-          </Text>
-        </Animated.View>
-      </Animated.View>
-    </Modal>
+          <YStack alignItems="center" gap={Spacing.lg}>
+            <ActivityIndicator size="large" color={colors.textPrimary} />
+            <Text color={colors.textSecondary} fontSize={15} textAlign="center">
+              {message}
+            </Text>
+          </YStack>
+        </Dialog.Content>
+      </Dialog.Portal>
+    </Dialog>
   );
 };
 

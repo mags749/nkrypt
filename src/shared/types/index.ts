@@ -30,19 +30,16 @@ export interface FolderWithCount extends Folder {
 export interface NkryptFile {
   id: string;
   folderId: string;
-  site: string;
-  username: string; // legacy plaintext — empty for new rows; use encryptedUsername
-  encryptedUsername: string; // AES-256 encrypted
-  encryptedCredentials: string; // AES-256 encrypted
+  key: string;
+  value: string; // plaintext OR AES-256-CTR hex (when isEncrypted)
+  isEncrypted: boolean;
+  isLink: boolean;
   createdAt: number;
   updatedAt: number;
 }
 
-export interface NkryptFileDecrypted extends Omit<
-  NkryptFile,
-  "encryptedCredentials"
-> {
-  credentials: string;
+export interface NkryptFileDecrypted extends NkryptFile {
+  decryptedValue: string; // always plaintext
 }
 
 // ─── Auth ────────────────────────────────────────────────────────────────────
@@ -63,7 +60,6 @@ export interface RootStackParamList {
   "/auth": undefined;
   "/folders": undefined;
   "/folders/[id]": { id: string };
-  "/files/[id]": { id: string };
   "/create-folder": undefined;
   "/create-file": { folderId: string };
   "/settings": undefined;

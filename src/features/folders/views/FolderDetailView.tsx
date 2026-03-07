@@ -1,14 +1,7 @@
 import React from "react";
 import { FlatList } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import {
-  AlertDialog,
-  Separator,
-  Text,
-  View,
-  XStack,
-  YStack,
-} from "tamagui";
+import { Separator, Text, View, XStack, YStack } from "tamagui";
 
 import { useColors } from "@context/providers/themeStore";
 import { BxIcon } from "@shared/components/BxIcon";
@@ -17,6 +10,7 @@ import { Shadow, Spacing } from "@shared/constants/design";
 import type { NkryptFile } from "@shared/types";
 import { ControlledSheet } from "@shared/components/ControlledSheet";
 import { Button } from "@shared/components/ui";
+import { ConfirmDialog } from "@shared/components/ConfirmDialog";
 
 interface FolderDetailViewProps {
   folderName: string;
@@ -24,16 +18,19 @@ interface FolderDetailViewProps {
   onBack: () => void;
   onMoreOptions: (flag: boolean) => void;
   onFilePress: (id: string) => void;
+  onFileReveal: (id: string) => void;
+  onFileCopy: (id: string) => void;
+  onFileOpenLink: (id: string) => void;
   onDeleteFile: (id: string) => void;
   onNewFile: () => void;
   onEditFolder: () => void;
   onDeleteFolder: () => void;
   openMoreOptionSheet: boolean;
-  // Delete file dialog
+  revealedFileId: string | null;
+  decryptedValue: string | null;
   deleteFileDialogOpen: boolean;
   setDeleteFileDialogOpen: (open: boolean) => void;
   onConfirmDeleteFile: () => void;
-  // Delete folder dialog
   deleteFolderDialogOpen: boolean;
   setDeleteFolderDialogOpen: (open: boolean) => void;
   onConfirmDeleteFolder: () => void;
@@ -45,11 +42,16 @@ export const FolderDetailView = ({
   onBack,
   onMoreOptions,
   onFilePress,
+  onFileReveal,
+  onFileCopy,
+  onFileOpenLink,
   onDeleteFile,
   onNewFile,
   onEditFolder,
   onDeleteFolder,
   openMoreOptionSheet,
+  revealedFileId,
+  decryptedValue,
   deleteFileDialogOpen,
   setDeleteFileDialogOpen,
   onConfirmDeleteFile,
@@ -58,6 +60,7 @@ export const FolderDetailView = ({
   onConfirmDeleteFolder,
 }: FolderDetailViewProps) => {
   const colors = useColors();
+
   return (
     <SafeAreaView
       style={{ flex: 1, backgroundColor: colors.background }}
@@ -123,7 +126,12 @@ export const FolderDetailView = ({
           <FileItem
             file={item}
             onPress={() => onFilePress(item.id)}
+            onReveal={() => onFileReveal(item.id)}
+            onCopy={() => onFileCopy(item.id)}
+            onOpenLink={() => onFileOpenLink(item.id)}
             onDelete={() => onDeleteFile(item.id)}
+            isRevealed={revealedFileId === item.id}
+            decryptedValue={revealedFileId === item.id ? decryptedValue : null}
           />
         )}
         ListEmptyComponent={
@@ -187,86 +195,30 @@ export const FolderDetailView = ({
       </ControlledSheet>
 
       {/* Delete file confirmation */}
-      <AlertDialog open={deleteFileDialogOpen} onOpenChange={setDeleteFileDialogOpen}>
-        <AlertDialog.Portal>
-          <AlertDialog.Overlay
-            key="overlay"
-            animation="quick"
-            opacity={0.5}
-            enterStyle={{ opacity: 0 }}
-            exitStyle={{ opacity: 0 }}
-          />
-          <AlertDialog.Content
-            key="content"
-            animation="quick"
-            enterStyle={{ opacity: 0, scale: 0.95 }}
-            exitStyle={{ opacity: 0, scale: 0.95 }}
-            backgroundColor={colors.surfaceElevated}
-            borderRadius={16}
-            padding={Spacing["2xl"]}
-            maxWidth={340}
-            width="90%"
-          >
-            <YStack gap={Spacing.md}>
-              <AlertDialog.Title color={colors.textPrimary} fontSize={18} fontWeight="700">
-                Delete File
-              </AlertDialog.Title>
-              <AlertDialog.Description color={colors.textSecondary} fontSize={14}>
-                This action cannot be undone.
-              </AlertDialog.Description>
-              <XStack gap={Spacing.md} justifyContent="flex-end" marginTop={Spacing.sm}>
-                <AlertDialog.Cancel asChild>
-                  <Button label="Cancel" variant="ghost" size="sm" onPress={() => setDeleteFileDialogOpen(false)} />
-                </AlertDialog.Cancel>
-                <AlertDialog.Action asChild>
-                  <Button label="Delete" variant="danger" size="sm" onPress={onConfirmDeleteFile} />
-                </AlertDialog.Action>
-              </XStack>
-            </YStack>
-          </AlertDialog.Content>
-        </AlertDialog.Portal>
-      </AlertDialog>
+      <ConfirmDialog
+        open={deleteFileDialogOpen}
+        onOpenChange={setDeleteFileDialogOpen}
+        title="Delete File"
+        description="This action cannot be undone."
+        confirmLabel="Delete"
+        cancelLabel="Cancel"
+        variant="danger"
+        onConfirm={onConfirmDeleteFile}
+        onCancel={() => setDeleteFileDialogOpen(false)}
+      />
 
       {/* Delete folder confirmation */}
-      <AlertDialog open={deleteFolderDialogOpen} onOpenChange={setDeleteFolderDialogOpen}>
-        <AlertDialog.Portal>
-          <AlertDialog.Overlay
-            key="overlay"
-            animation="quick"
-            opacity={0.5}
-            enterStyle={{ opacity: 0 }}
-            exitStyle={{ opacity: 0 }}
-          />
-          <AlertDialog.Content
-            key="content"
-            animation="quick"
-            enterStyle={{ opacity: 0, scale: 0.95 }}
-            exitStyle={{ opacity: 0, scale: 0.95 }}
-            backgroundColor={colors.surfaceElevated}
-            borderRadius={16}
-            padding={Spacing["2xl"]}
-            maxWidth={340}
-            width="90%"
-          >
-            <YStack gap={Spacing.md}>
-              <AlertDialog.Title color={colors.textPrimary} fontSize={18} fontWeight="700">
-                Delete Folder
-              </AlertDialog.Title>
-              <AlertDialog.Description color={colors.textSecondary} fontSize={14}>
-                All files in "{folderName}" will be permanently deleted. This cannot be undone.
-              </AlertDialog.Description>
-              <XStack gap={Spacing.md} justifyContent="flex-end" marginTop={Spacing.sm}>
-                <AlertDialog.Cancel asChild>
-                  <Button label="Cancel" variant="ghost" size="sm" onPress={() => setDeleteFolderDialogOpen(false)} />
-                </AlertDialog.Cancel>
-                <AlertDialog.Action asChild>
-                  <Button label="Delete" variant="danger" size="sm" onPress={() => void onConfirmDeleteFolder()} />
-                </AlertDialog.Action>
-              </XStack>
-            </YStack>
-          </AlertDialog.Content>
-        </AlertDialog.Portal>
-      </AlertDialog>
+      <ConfirmDialog
+        open={deleteFolderDialogOpen}
+        onOpenChange={setDeleteFolderDialogOpen}
+        title="Delete Folder"
+        description={`All files in "${folderName}" will be permanently deleted. This cannot be undone.`}
+        confirmLabel="Delete"
+        cancelLabel="Cancel"
+        variant="danger"
+        onConfirm={() => void onConfirmDeleteFolder()}
+        onCancel={() => setDeleteFolderDialogOpen(false)}
+      />
     </SafeAreaView>
   );
 };

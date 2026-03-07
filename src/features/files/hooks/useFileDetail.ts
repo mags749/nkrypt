@@ -1,5 +1,6 @@
 import { useCallback } from "react";
 import * as Clipboard from "expo-clipboard";
+import { Linking } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useFilesStore } from "@features/files/store/filesStore";
 import { useFoldersStore } from "@features/folders/store/foldersStore";
@@ -18,19 +19,17 @@ export const useFileDetail = () => {
 
   const {
     fileId: revealedFileId,
-    decryptedCredentials,
-    decryptedUsername,
+    decryptedValue,
     clearRevealed,
   } = useRevealStore();
 
-  // Only show revealed values for this specific file
   const isThisFileRevealed = revealedFileId === id;
-  const credentialsRevealed =
-    isThisFileRevealed && decryptedCredentials !== null;
-  const usernameRevealed = isThisFileRevealed && decryptedUsername !== null;
+  const valueRevealed = isThisFileRevealed && decryptedValue !== null;
 
   const onReveal = useCallback(() => {
-    if (credentialsRevealed) {
+    if (!file) return;
+    if (!file.isEncrypted) return; // plaintext — nothing to reveal
+    if (valueRevealed) {
       clearRevealed();
     } else {
       router.push({
@@ -38,40 +37,28 @@ export const useFileDetail = () => {
         params: { fileId: id, mode: "reveal" },
       });
     }
-  }, [credentialsRevealed, id, router, clearRevealed]);
+  }, [valueRevealed, id, file, router, clearRevealed]);
 
-  const onRevealUsername = useCallback(() => {
-    if (usernameRevealed) {
-      clearRevealed();
-    } else {
-      router.push({
-        pathname: "/modals/passkey-prompt",
-        params: { fileId: id, mode: "reveal" },
-      });
-    }
-  }, [usernameRevealed, id, router, clearRevealed]);
-
-  const onCopyCredentials = useCallback(() => {
-    if (credentialsRevealed && decryptedCredentials) {
-      void Clipboard.setStringAsync(decryptedCredentials);
+  const onCopyValue = useCallback(() => {
+    if (!file) return;
+    if (!file.isEncrypted) {
+      void Clipboard.setStringAsync(file.value);
+    } else if (valueRevealed && decryptedValue) {
+      void Clipboard.setStringAsync(decryptedValue);
     } else {
       router.push({
         pathname: "/modals/passkey-prompt",
         params: { fileId: id, mode: "copy" },
       });
     }
-  }, [credentialsRevealed, decryptedCredentials, id, router]);
+  }, [valueRevealed, decryptedValue, id, file, router]);
 
-  const onCopyUsername = useCallback(() => {
-    if (usernameRevealed && decryptedUsername) {
-      void Clipboard.setStringAsync(decryptedUsername);
-    } else {
-      router.push({
-        pathname: "/modals/passkey-prompt",
-        params: { fileId: id, mode: "copy-username" },
-      });
-    }
-  }, [usernameRevealed, decryptedUsername, id, router]);
+  const onOpenLink = useCallback(() => {
+    if (!file) return;
+    const url = valueRevealed && decryptedValue ? decryptedValue : file.value;
+    const finalUrl = /^https?:\/\//i.test(url) ? url : `https://${url}`;
+    void Linking.openURL(finalUrl);
+  }, [file, valueRevealed, decryptedValue]);
 
   const onCopyField = useCallback(
     (value: string) => void Clipboard.setStringAsync(value),
@@ -82,18 +69,26 @@ export const useFileDetail = () => {
     file,
     folder,
     id,
-    credentialsRevealed,
-    decryptedCredentials,
-    usernameRevealed,
-    decryptedUsername,
+    valueRevealed,
+    decryptedValue,
     onReveal,
-    onRevealUsername,
-    onCopyCredentials,
-    onCopyUsername,
+    onCopyValue,
+    onOpenLink,
     onCopyField,
     onBack: () => router.back(),
-    onEdit: () =>
-      router.push({ pathname: "/modals/create-file", params: { editId: id } }),
+    onEdit: () => {
+      if (file?.isEncrypted) {
+        router.push({
+          pathname: "/modals/passkey-prompt",
+          params: { fileId: id, mode: "edit" },
+        });
+      } else {
+        router.push({
+          pathname: "/modals/create-file",
+          params: { editId: id },
+        });
+      }
+    },
     onNewFile: () =>
       file &&
       router.push({

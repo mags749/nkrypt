@@ -1,4 +1,5 @@
 import React from "react";
+import { Switch } from "react-native";
 import { Text, View, XStack, YStack } from "tamagui";
 
 import { useColors } from "@context/providers/themeStore";
@@ -10,14 +11,16 @@ import { Radius, Spacing } from "@shared/constants/design";
 
 interface CreateFileViewProps {
   isEditing: boolean;
-  site: string;
-  onSiteChange: (v: string) => void;
-  username: string;
-  onUsernameChange: (v: string) => void;
-  credentials: string;
-  onCredentialsChange: (v: string) => void;
-  showCreds: boolean;
-  onToggleCreds: () => void;
+  fileKey: string;
+  onKeyChange: (v: string) => void;
+  value: string;
+  onValueChange: (v: string) => void;
+  isEncrypted: boolean;
+  onEncryptedChange: (v: boolean) => void;
+  isLink: boolean;
+  onLinkChange: (v: boolean) => void;
+  showValue: boolean;
+  onToggleShowValue: () => void;
   isLoading: boolean;
   errors: Record<string, string>;
   onSave: () => void;
@@ -26,27 +29,31 @@ interface CreateFileViewProps {
 
 export const CreateFileView = ({
   isEditing,
-  site,
-  onSiteChange,
-  username,
-  onUsernameChange,
-  credentials,
-  onCredentialsChange,
-  showCreds,
-  onToggleCreds,
+  fileKey,
+  onKeyChange,
+  value,
+  onValueChange,
+  isEncrypted,
+  onEncryptedChange,
+  isLink,
+  onLinkChange,
+  showValue,
+  onToggleShowValue,
   isLoading,
   errors,
   onSave,
   onClose,
 }: CreateFileViewProps) => {
   const colors = useColors();
+
   return (
     <BlurModal visible onDismiss={onClose} position="flex-end">
       <LoadingOverlay
         visible={isLoading}
-        message={isEditing ? "Updating entry…" : "Encrypting & saving…"}
+        message={isEditing ? "Updating entry…" : "Saving entry…"}
       />
 
+      {/* Header */}
       <XStack
         alignItems="flex-start"
         justifyContent="space-between"
@@ -65,7 +72,7 @@ export const CreateFileView = ({
           <Text fontSize={15} color={colors.textSecondary}>
             {isEditing
               ? "Update the entry details below."
-              : "Fill in the credentials to encrypt and save."}
+              : "Add a key/value pair to this folder."}
           </Text>
         </YStack>
         <XStack onPress={onClose} pressStyle={{ opacity: 0.7 }}>
@@ -73,70 +80,113 @@ export const CreateFileView = ({
         </XStack>
       </XStack>
 
+      {/* Key field */}
       <InputField
-        label="Site"
-        value={site}
-        onChangeText={onSiteChange}
-        placeholder="e.g. github.com"
-        keyboardType="url"
+        label="Key"
+        value={fileKey}
+        onChangeText={onKeyChange}
+        placeholder="e.g. Site, Username, Password"
         autoFocus
-        error={errors.site}
-      />
-      <InputField
-        label="Username"
-        value={username}
-        onChangeText={onUsernameChange}
-        placeholder="your@email.com"
-        keyboardType="email-address"
-        error={errors.username}
+        error={errors.key}
       />
 
-      <View style={{ position: "relative" }}>
+      {/* Value field */}
+      <View position="relative">
         <InputField
-          label={
-            isEditing ? "New Credentials (blank = keep current)" : "Credentials"
-          }
-          value={credentials}
-          onChangeText={onCredentialsChange}
-          placeholder="Password / secret"
-          secureTextEntry={!showCreds}
-          error={errors.credentials}
+          label={isEditing ? "Value (blank = keep current)" : "Value"}
+          value={value}
+          onChangeText={onValueChange}
+          placeholder={isEncrypted ? "Encrypted value" : "Plain text value"}
+          secureTextEntry={isEncrypted && !showValue}
+          error={errors.value}
         />
-        <XStack
-          onPress={onToggleCreds}
-          style={{
-            position: "absolute",
-            right: 0,
-            bottom: Spacing.xl,
-            padding: Spacing.sm,
-          }}
-          pressStyle={{ opacity: 0.7 }}
-        >
-          <BxIcon
-            name={showCreds ? "bx-hide" : "bx-show"}
-            size={18}
-            color={colors.textTertiary}
-          />
-        </XStack>
+        {isEncrypted && (
+          <XStack
+            onPress={onToggleShowValue}
+            position="absolute"
+            right={0}
+            bottom={Spacing.xl}
+            padding={Spacing.sm}
+            pressStyle={{ opacity: 0.7 }}
+          >
+            <BxIcon
+              name={showValue ? "bx-hide" : "bx-show"}
+              size={18}
+              color={colors.textTertiary}
+            />
+          </XStack>
+        )}
       </View>
 
+      {/* Toggle: Encrypted */}
       <XStack
         alignItems="center"
-        gap={Spacing.sm}
+        justifyContent="space-between"
         padding={Spacing.md}
-        borderRadius={8}
-        marginBottom={Spacing.sm}
+        borderRadius={Radius.md}
         backgroundColor={colors.surfaceSecondary}
+        marginBottom={Spacing.sm}
+        opacity={isLink ? 0.4 : 1}
       >
-        <BxIcon name="bx-lock-alt" size={14} color={colors.textTertiary} />
-        <Text
-          color={colors.textTertiary}
-          fontSize={12}
-          flex={1}
-          lineHeight={18}
-        >
-          Credentials encrypted with AES-256 using your Pass Key
-        </Text>
+        <XStack alignItems="center" gap={Spacing.sm} flex={1}>
+          <BxIcon
+            name="bx-lock-alt"
+            size={16}
+            color={isEncrypted && !isLink ? colors.accent : colors.textTertiary}
+          />
+          <YStack flex={1}>
+            <Text fontSize={14} fontWeight="600" color={colors.textPrimary}>
+              Encrypt value
+            </Text>
+            <Text fontSize={12} color={colors.textTertiary} lineHeight={18}>
+              {isLink
+                ? "Links cannot be encrypted"
+                : "Protect with AES-256 using your Pass Key"}
+            </Text>
+          </YStack>
+        </XStack>
+        <Switch
+          value={isEncrypted && !isLink}
+          onValueChange={(v) => !isLink && onEncryptedChange(v)}
+          disabled={isLink}
+          trackColor={{ false: colors.border, true: colors.accent }}
+          thumbColor="#fff"
+        />
+      </XStack>
+
+      {/* Toggle: Link */}
+      <XStack
+        alignItems="center"
+        justifyContent="space-between"
+        padding={Spacing.md}
+        borderRadius={Radius.md}
+        backgroundColor={colors.surfaceSecondary}
+        marginBottom={Spacing.sm}
+      >
+        <XStack alignItems="center" gap={Spacing.sm} flex={1}>
+          <BxIcon
+            name="bx-link-external"
+            size={16}
+            color={isLink ? colors.accent : colors.textTertiary}
+          />
+          <YStack flex={1}>
+            <Text fontSize={14} fontWeight="600" color={colors.textPrimary}>
+              Mark as link
+            </Text>
+            <Text fontSize={12} color={colors.textTertiary} lineHeight={18}>
+              Value is a URL that can be opened
+            </Text>
+          </YStack>
+        </XStack>
+        <Switch
+          value={isLink}
+          onValueChange={(v) => {
+            onLinkChange(v);
+            if (v) onEncryptedChange(false);
+          }}
+          trackColor={{ false: colors.border, true: colors.accent }}
+          thumbColor="#fff"
+        />
       </XStack>
 
       {errors.general && (
@@ -169,7 +219,7 @@ export const CreateFileView = ({
         <Button
           label={isEditing ? "Update" : "Save"}
           loading={isLoading}
-          loadingLabel={isEditing ? "Updating…" : "Encrypting…"}
+          loadingLabel={isEditing ? "Updating…" : "Saving…"}
           onPress={onSave}
           size="md"
         />

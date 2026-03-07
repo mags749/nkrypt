@@ -1,17 +1,9 @@
 import React from "react";
-import { KeyboardAvoidingView, Modal, Platform, StyleSheet, View } from "react-native";
-import { BlurView } from "expo-blur";
+import { KeyboardAvoidingView, Platform, StyleSheet } from "react-native";
+import { Dialog, YStack } from "tamagui";
 
 import { Radius, Spacing } from "@shared/constants/design";
 import { useColors } from "@context/providers/themeStore";
-import { useThemeStore } from "@context/providers/themeStore";
-
-interface BlurModalProps {
-  visible: boolean;
-  onDismiss: () => void;
-  children: React.ReactNode;
-  position?: "flex-end" | "center";
-}
 
 export const BlurModal = ({
   visible,
@@ -20,90 +12,49 @@ export const BlurModal = ({
   position = "flex-end",
 }: BlurModalProps) => {
   const colors = useColors();
-  const isDark = useThemeStore((s) => s.isDark);
 
   return (
-    <Modal
-      visible={visible}
-      transparent
-      animationType="fade"
-      onRequestClose={onDismiss}
-      statusBarTranslucent
+    <Dialog
+      modal={false}
+      open={visible}
+      onOpenChange={(open) => !open && onDismiss()}
     >
-      {/* Full-screen BlurView behind everything */}
-      <BlurView
-        style={StyleSheet.absoluteFill}
-        intensity={50}
-        tint={isDark ? "dark" : "light"}
-        experimentalBlurMethod="dimezisBlurView"
-      />
+      <Dialog.Portal>
+        {Platform.OS === "android" && (
+          <YStack backgroundColor="rgba(0, 0, 0, 0.72)" fullscreen />
+        )}
+        {/* 1. The Blur Overlay */}
+        <Dialog.Overlay
+          key="overlay"
+          transition="fast"
+          enterStyle={{ opacity: 0 }}
+          exitStyle={{ opacity: 0 }}
+          onPress={onDismiss}
+          // We make the background transparent so the BlurView is visible
+          backgroundColor="transparent"
+          // Ensure it fills the screenapp
+          style={StyleSheet.absoluteFill}
+        ></Dialog.Overlay>
 
-      {/* Semi-transparent dark scrim on top of blur */}
-      <View
-        style={[
-          StyleSheet.absoluteFill,
-          { backgroundColor: isDark ? "rgba(0,0,0,0.45)" : "rgba(0,0,0,0.25)" },
-        ]}
-      />
-
-      {/* Dismiss tap area */}
-      <View
-        style={[styles.backdrop]}
-        onTouchEnd={(e) => {
-          // Only dismiss if tapping the backdrop directly (not the card)
-          if (e.target === e.currentTarget) onDismiss();
-        }}
-      >
-        <KeyboardAvoidingView
-          behavior={Platform.OS === "ios" ? "padding" : "height"}
-          style={[
-            styles.positioner,
-            position === "flex-end" ? styles.bottom : styles.center,
-          ]}
-          pointerEvents="box-none"
+        {/* 2. The Content Box */}
+        <Dialog.Content
+          bordered
+          elevate
+          key="content"
+          transition={["fast", { opacity: { overshootClamping: true } }]}
+          enterStyle={{ x: 0, y: 15, opacity: 0, scale: 0.95 }}
+          exitStyle={{ x: 0, y: 10, opacity: 0, scale: 0.95 }}
+          // Styling from your original component
+          br={Radius.xl}
+          p={Spacing["2xl"]}
+          backgroundColor={colors.surfaceElevated}
+          width="90%"
+          maxWidth={450}
+          alignSelf="center"
         >
-          <View
-            style={[
-              styles.card,
-              { backgroundColor: colors.surfaceElevated },
-            ]}
-          >
-            {children}
-          </View>
-        </KeyboardAvoidingView>
-      </View>
-    </Modal>
+          <YStack>{children}</YStack>
+        </Dialog.Content>
+      </Dialog.Portal>
+    </Dialog>
   );
 };
-
-const styles = StyleSheet.create({
-  backdrop: {
-    flex: 1,
-  },
-  positioner: {
-    width: "100%",
-    alignItems: "center",
-  },
-  bottom: {
-    justifyContent: "flex-end",
-    marginTop: "auto",
-  },
-  center: {
-    justifyContent: "center",
-    flex: 1,
-  },
-  card: {
-    width: "90%",
-    maxWidth: 450,
-    borderRadius: Radius.xl,
-    padding: Spacing["2xl"],
-    // Bottom spacing when anchored to bottom
-    marginBottom: Spacing["3xl"],
-    // Shadow
-    shadowColor: "#000",
-    shadowOpacity: 0.2,
-    shadowRadius: 24,
-    shadowOffset: { width: 0, height: -4 },
-    elevation: 20,
-  },
-});

@@ -11,15 +11,17 @@ import type { NkryptFile } from "@shared/types";
 
 interface CreateFileInput {
   folderId: string;
-  site: string;
-  username: string;
-  credentials: string; // plaintext → encrypted on write
+  key: string;
+  value: string; // plaintext – encrypted on write if isEncrypted
+  isEncrypted: boolean;
+  isLink: boolean;
 }
 
 interface UpdateFileInput {
-  site?: string;
-  username?: string;
-  credentials?: string; // plaintext → re-encrypted if provided
+  key?: string;
+  value?: string; // plaintext – re-encrypted if isEncrypted
+  isEncrypted?: boolean;
+  isLink?: boolean;
 }
 
 interface FilesState {
@@ -31,8 +33,8 @@ interface FilesState {
   createFile: (input: CreateFileInput) => Promise<string>;
   updateFile: (id: string, input: UpdateFileInput) => Promise<void>;
   deleteFile: (id: string, folderId: string) => Promise<void>;
-  decryptFileCredentials: (file: NkryptFile, passKey?: string) => string | null;
-  decryptFileUsername: (file: NkryptFile, passKey: string) => string | null;
+  /** Returns plaintext value, or null if decryption fails / no passKey */
+  decryptFileValue: (file: NkryptFile, passKey?: string) => string | null;
 }
 
 // ─── Store ────────────────────────────────────────────────────────────────────
@@ -54,10 +56,10 @@ export const useFilesStore = create<FilesState>((set, get) => ({
       const mapped: NkryptFile[] = rows.map((r) => ({
         id: r.id,
         folderId: r.folderId,
-        site: r.site,
-        username: r.username, // legacy plaintext (empty for new rows)
-        encryptedUsername: r.encryptedUsername ?? "",
-        encryptedCredentials: r.encryptedCredentials,
+        key: r.key,
+        value: r.value,
+        isEncrypted: Boolean(r.isEncrypted),
+        isLink: Boolean(r.isLink),
         createdAt:
           r.createdAt instanceof Date ? r.createdAt.getTime() : r.createdAt,
         updatedAt:
@@ -77,17 +79,18 @@ export const useFilesStore = create<FilesState>((set, get) => ({
   },
 
   createFile: async (input) => {
-    const passKey = useAuthStore.getState().getPassKey();
-    if (!passKey) {
-      useAuthStore.getState().logout();
-      throw new Error("Session expired. Please log in again.");
+    let storedValue = input.value;
+
+    if (input.isEncrypted) {
+      const passKey = useAuthStore.getState().getPassKey();
+      if (!passKey) {
+        useAuthStore.getState().logout();
+        throw new Error("Session expired. Please log in again.");
+      }
+      const result = encrypt(input.value, passKey);
+      if (!result.success) throw new Error(result.error);
+      storedValue = result.data;
     }
-
-    const credResult = encrypt(input.credentials, passKey);
-    if (!credResult.success) throw new Error(credResult.error);
-
-    const userResult = encrypt(input.username.trim(), passKey);
-    if (!userResult.success) throw new Error(userResult.error);
 
     const id = nanoid();
     const now = new Date();
@@ -95,10 +98,10 @@ export const useFilesStore = create<FilesState>((set, get) => ({
     await db.insert(files).values({
       id,
       folderId: input.folderId,
-      site: input.site.trim(),
-      username: "", // blank – username is now encrypted
-      encryptedUsername: userResult.data,
-      encryptedCredentials: credResult.data,
+      key: input.key.trim(),
+      value: storedValue,
+      isEncrypted: input.isEncrypted,
+      isLink: input.isLink,
       createdAt: now,
       updatedAt: now,
     });
@@ -111,37 +114,38 @@ export const useFilesStore = create<FilesState>((set, get) => ({
     const now = new Date();
     const patch: Partial<typeof files.$inferInsert> = { updatedAt: now };
 
-    if (input.site !== undefined) patch.site = input.site.trim();
+    if (input.key !== undefined) patch.key = input.key.trim();
+    if (input.isLink !== undefined) patch.isLink = input.isLink;
 
-    if (input.username !== undefined) {
-      const passKey = useAuthStore.getState().getPassKey();
-      if (!passKey) {
-        useAuthStore.getState().logout();
-        throw new Error("Session expired. Please log in again.");
-      }
-      const userResult = encrypt(input.username.trim(), passKey);
-      if (!userResult.success) throw new Error(userResult.error);
-      patch.username = ""; // clear legacy plaintext field
-      patch.encryptedUsername = userResult.data;
-    }
+    // Determine the effective isEncrypted for this update
+    const existingFile = Object.values(get().filesByFolder)
+      .flat()
+      .find((f) => f.id === id);
+    const effectiveEncrypted =
+      input.isEncrypted !== undefined
+        ? input.isEncrypted
+        : (existingFile?.isEncrypted ?? false);
 
-    if (input.credentials !== undefined) {
-      const passKey = useAuthStore.getState().getPassKey();
-      if (!passKey) {
-        useAuthStore.getState().logout();
-        throw new Error("Session expired. Please log in again.");
+    if (input.isEncrypted !== undefined) patch.isEncrypted = input.isEncrypted;
+
+    if (input.value !== undefined) {
+      let storedValue = input.value;
+      if (effectiveEncrypted) {
+        const passKey = useAuthStore.getState().getPassKey();
+        if (!passKey) {
+          useAuthStore.getState().logout();
+          throw new Error("Session expired. Please log in again.");
+        }
+        const result = encrypt(input.value, passKey);
+        if (!result.success) throw new Error(result.error);
+        storedValue = result.data;
       }
-      const result = encrypt(input.credentials, passKey);
-      if (!result.success) throw new Error(result.error);
-      patch.encryptedCredentials = result.data;
+      patch.value = storedValue;
     }
 
     await db.update(files).set(patch).where(eq(files.id, id));
 
-    const file = Object.values(get().filesByFolder)
-      .flat()
-      .find((f) => f.id === id);
-    if (file) await get().loadFilesForFolder(file.folderId);
+    if (existingFile) await get().loadFilesForFolder(existingFile.folderId);
   },
 
   deleteFile: async (id, folderId) => {
@@ -149,24 +153,17 @@ export const useFilesStore = create<FilesState>((set, get) => ({
     await get().loadFilesForFolder(folderId);
   },
 
-  decryptFileCredentials: (file, passKey) => {
+  decryptFileValue: (file, passKey) => {
+    if (!file.isEncrypted) return file.value;
     const key = passKey ?? useAuthStore.getState().getPassKey();
     if (!key) return null;
-    const result = decrypt(file.encryptedCredentials, key);
-    return result.success ? result.data : null;
-  },
-
-  decryptFileUsername: (file, passKey) => {
-    // Legacy rows: no encryptedUsername yet — fall back to plaintext
-    if (!file.encryptedUsername) return file.username || null;
-    const result = decrypt(file.encryptedUsername, passKey);
+    const result = decrypt(file.value, key);
     return result.success ? result.data : null;
   },
 }));
 
 // ─── reEncryptAllFiles ────────────────────────────────────────────────────────
-// Called by authStore.changePassKey. Iterates every file row and
-// decrypts with oldPassKey then re-encrypts with newPassKey.
+// Called by authStore.changePassKey. Re-encrypts all encrypted file values.
 
 export const reEncryptAllFiles = async (
   oldPassKey: string,
@@ -175,28 +172,17 @@ export const reEncryptAllFiles = async (
   const allFiles = await db.select().from(files);
 
   for (const file of allFiles) {
-    const updates: Partial<typeof files.$inferInsert> = {
-      updatedAt: new Date(),
-    };
+    if (!file.isEncrypted) continue;
 
-    // Re-encrypt credentials
-    const decCred = decrypt(file.encryptedCredentials, oldPassKey);
-    if (decCred.success) {
-      const encCred = encrypt(decCred.data, newPassKey);
-      if (encCred.success) updates.encryptedCredentials = encCred.data;
-    }
+    const decResult = decrypt(file.value, oldPassKey);
+    if (!decResult.success) continue;
 
-    // Re-encrypt username (if present)
-    if (file.encryptedUsername) {
-      const decUser = decrypt(file.encryptedUsername, oldPassKey);
-      if (decUser.success) {
-        const encUser = encrypt(decUser.data, newPassKey);
-        if (encUser.success) updates.encryptedUsername = encUser.data;
-      }
-    }
+    const encResult = encrypt(decResult.data, newPassKey);
+    if (!encResult.success) continue;
 
-    if (Object.keys(updates).length > 1) {
-      await db.update(files).set(updates).where(eq(files.id, file.id));
-    }
+    await db
+      .update(files)
+      .set({ value: encResult.data, updatedAt: new Date() })
+      .where(eq(files.id, file.id));
   }
 };

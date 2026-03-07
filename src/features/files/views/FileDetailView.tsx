@@ -6,7 +6,6 @@ import { Text, View, XStack } from "tamagui";
 
 import { useColors } from "@context/providers/themeStore";
 import { BxIcon } from "@shared/components/BxIcon";
-import { FieldRow } from "@shared/components/FileDetail/FieldRow";
 import { MetaGrid } from "@shared/components/FileDetail/MetaGrid";
 import { Shadow, Spacing } from "@shared/constants/design";
 import type { NkryptFile } from "@shared/types";
@@ -14,52 +13,43 @@ import type { NkryptFile } from "@shared/types";
 interface FileDetailViewProps {
   file: NkryptFile;
   folderName: string;
-  credentialsRevealed: boolean;
-  decryptedCredentials: string | null;
-  usernameRevealed: boolean;
-  decryptedUsername: string | null;
+  valueRevealed: boolean;
+  decryptedValue: string | null;
   onBack: () => void;
   onEdit: () => void;
   onNewFile: () => void;
   onReveal: () => void;
-  onRevealUsername: () => void;
-  onCopyCredentials: () => void;
-  onCopyUsername: () => void;
-  onCopyField: (value: string) => void;
+  onCopyValue: () => void;
+  onOpenLink: () => void;
 }
-
-const openSiteUrl = (site: string) => {
-  let url = site.trim();
-  if (!url) return;
-  // Add protocol if missing
-  if (!/^https?:\/\//i.test(url)) {
-    url = `https://${url}`;
-  }
-  void Linking.openURL(url);
-};
 
 export const FileDetailView = ({
   file,
   folderName,
-  credentialsRevealed,
-  decryptedCredentials,
-  usernameRevealed,
-  decryptedUsername,
+  valueRevealed,
+  decryptedValue,
   onBack,
   onEdit,
   onNewFile,
   onReveal,
-  onRevealUsername,
-  onCopyCredentials,
-  onCopyUsername,
-  onCopyField,
+  onCopyValue,
+  onOpenLink,
 }: FileDetailViewProps) => {
   const colors = useColors();
+
+  const displayValue =
+    valueRevealed && decryptedValue !== null
+      ? decryptedValue
+      : file.isEncrypted
+        ? null
+        : file.value;
+
   return (
     <SafeAreaView
       style={{ flex: 1, backgroundColor: colors.background }}
       edges={["top"]}
     >
+      {/* Header */}
       <XStack
         alignItems="center"
         justifyContent="space-between"
@@ -77,7 +67,7 @@ export const FileDetailView = ({
           color={colors.textPrimary}
           numberOfLines={1}
         >
-          {file.site}
+          {file.key}
         </Text>
         <XStack onPress={onEdit} pressStyle={{ opacity: 0.7 }}>
           <BxIcon name="bx-edit" size={20} color={colors.textPrimary} />
@@ -88,32 +78,115 @@ export const FileDetailView = ({
         contentContainerStyle={{ padding: Spacing["2xl"], paddingBottom: 120 }}
         showsVerticalScrollIndicator={false}
       >
-        <FieldRow
-          label="Site"
-          value={file.site}
-          onCopy={() => onCopyField(file.site)}
-          onOpen={() => openSiteUrl(file.site)}
-        />
+        {/* Key row */}
+        <XStack
+          alignItems="center"
+          justifyContent="space-between"
+          paddingVertical={Spacing.lg}
+        >
+          <View flex={1}>
+            <Text
+              fontSize={11}
+              color={colors.textTertiary}
+              letterSpacing={1}
+              marginBottom={4}
+            >
+              KEY
+            </Text>
+            <Text fontSize={17} color={colors.textPrimary} fontWeight="500">
+              {file.key}
+            </Text>
+          </View>
+          <XStack
+            onPress={() =>
+              void (navigator as any)?.clipboard?.writeText(file.key)
+            }
+            padding={Spacing.sm}
+            pressStyle={{ opacity: 0.6 }}
+          >
+            <BxIcon name="bx-copy" size={18} color={colors.textTertiary} />
+          </XStack>
+        </XStack>
+
         <View height={1} backgroundColor={colors.separator} />
 
-        <FieldRow
-          label="Username"
-          value={usernameRevealed ? (decryptedUsername ?? "") : ""}
-          masked
-          revealed={usernameRevealed}
-          onReveal={onRevealUsername}
-          onCopy={onCopyUsername}
-        />
-        <View height={1} backgroundColor={colors.separator} />
+        {/* Value row */}
+        <XStack
+          alignItems="center"
+          justifyContent="space-between"
+          paddingVertical={Spacing.lg}
+        >
+          <View flex={1}>
+            <XStack alignItems="center" gap={Spacing.xs} marginBottom={4}>
+              <Text fontSize={11} color={colors.textTertiary} letterSpacing={1}>
+                VALUE
+              </Text>
+              {file.isEncrypted && (
+                <BxIcon
+                  name="bx-lock-alt"
+                  size={11}
+                  color={colors.textTertiary}
+                />
+              )}
+              {file.isLink && (
+                <BxIcon
+                  name="bx-link-external"
+                  size={11}
+                  color={colors.textTertiary}
+                />
+              )}
+            </XStack>
+            <Text
+              fontSize={17}
+              color={
+                displayValue !== null ? colors.textPrimary : colors.textTertiary
+              }
+              fontWeight="500"
+            >
+              {displayValue !== null ? displayValue : "••••••••••••"}
+            </Text>
+          </View>
 
-        <FieldRow
-          label="Credentials"
-          value={decryptedCredentials ?? ""}
-          masked
-          revealed={credentialsRevealed}
-          onReveal={onReveal}
-          onCopy={onCopyCredentials}
-        />
+          <XStack alignItems="center" gap={Spacing.sm}>
+            {/* Reveal/hide toggle for encrypted */}
+            {file.isEncrypted && (
+              <XStack
+                onPress={onReveal}
+                padding={Spacing.sm}
+                pressStyle={{ opacity: 0.6 }}
+              >
+                <BxIcon
+                  name={valueRevealed ? "bx-hide" : "bx-show"}
+                  size={18}
+                  color={colors.textTertiary}
+                />
+              </XStack>
+            )}
+            {/* Copy button */}
+            <XStack
+              onPress={onCopyValue}
+              padding={Spacing.sm}
+              pressStyle={{ opacity: 0.6 }}
+            >
+              <BxIcon name="bx-copy" size={18} color={colors.textTertiary} />
+            </XStack>
+            {/* Open link button */}
+            {file.isLink && (
+              <XStack
+                onPress={onOpenLink}
+                padding={Spacing.sm}
+                pressStyle={{ opacity: 0.6 }}
+              >
+                <BxIcon
+                  name="bx-link-external"
+                  size={18}
+                  color={colors.textTertiary}
+                />
+              </XStack>
+            )}
+          </XStack>
+        </XStack>
+
         <MetaGrid
           createdAt={file.createdAt}
           updatedAt={file.updatedAt}
@@ -121,6 +194,7 @@ export const FileDetailView = ({
         />
       </ScrollView>
 
+      {/* FAB */}
       <XStack
         onPress={onNewFile}
         position="absolute"

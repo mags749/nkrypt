@@ -1,12 +1,12 @@
 import React from "react";
 import { FlatList, TextInput as RNTextInput } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { AlertDialog, Text, View, XStack, YStack } from "tamagui";
+import { Text, View, XStack } from "tamagui";
 
 import { useColors } from "@context/providers/themeStore";
 import { BxIcon } from "@shared/components/BxIcon";
 import { ScreenHeader } from "@shared/components/ScreenHeader";
-import { Button } from "@shared/components/ui";
+import { ConfirmDialog } from "@shared/components/ConfirmDialog";
 import { Radius, Spacing } from "@shared/constants/design";
 
 interface Category {
@@ -28,7 +28,6 @@ interface CategoriesViewProps {
   onSaveEdit: () => void;
   onDelete: (id: string, name: string, isDefault: boolean) => void;
   onBack: () => void;
-  // Dialog state
   duplicateDialogOpen: boolean;
   setDuplicateDialogOpen: (v: boolean) => void;
   defaultCategoryDialogOpen: boolean;
@@ -61,6 +60,7 @@ export const CategoriesView = ({
   onConfirmDelete,
 }: CategoriesViewProps) => {
   const colors = useColors();
+
   return (
     <SafeAreaView
       style={{ flex: 1, backgroundColor: colors.background }}
@@ -207,61 +207,37 @@ export const CategoriesView = ({
       />
 
       {/* Duplicate category error */}
-      <AlertDialog open={duplicateDialogOpen} onOpenChange={setDuplicateDialogOpen}>
-        <AlertDialog.Portal>
-          <AlertDialog.Overlay key="overlay" animation="quick" opacity={0.5} enterStyle={{ opacity: 0 }} exitStyle={{ opacity: 0 }} />
-          <AlertDialog.Content key="content" animation="quick" enterStyle={{ opacity: 0, scale: 0.95 }} exitStyle={{ opacity: 0, scale: 0.95 }} backgroundColor={colors.surfaceElevated} borderRadius={16} padding={Spacing["2xl"]} maxWidth={340} width="90%">
-            <YStack gap={Spacing.md}>
-              <AlertDialog.Title color={colors.textPrimary} fontSize={18} fontWeight="700">Duplicate Category</AlertDialog.Title>
-              <AlertDialog.Description color={colors.textSecondary} fontSize={14}>A category with this name already exists.</AlertDialog.Description>
-              <XStack justifyContent="flex-end" marginTop={Spacing.sm}>
-                <AlertDialog.Action asChild>
-                  <Button label="OK" size="sm" onPress={() => setDuplicateDialogOpen(false)} />
-                </AlertDialog.Action>
-              </XStack>
-            </YStack>
-          </AlertDialog.Content>
-        </AlertDialog.Portal>
-      </AlertDialog>
+      <ConfirmDialog
+        open={duplicateDialogOpen}
+        onOpenChange={setDuplicateDialogOpen}
+        title="Duplicate Category"
+        description="A category with this name already exists."
+        confirmLabel="OK"
+        onConfirm={() => setDuplicateDialogOpen(false)}
+      />
 
       {/* Cannot delete default category */}
-      <AlertDialog open={defaultCategoryDialogOpen} onOpenChange={setDefaultCategoryDialogOpen}>
-        <AlertDialog.Portal>
-          <AlertDialog.Overlay key="overlay" animation="quick" opacity={0.5} enterStyle={{ opacity: 0 }} exitStyle={{ opacity: 0 }} />
-          <AlertDialog.Content key="content" animation="quick" enterStyle={{ opacity: 0, scale: 0.95 }} exitStyle={{ opacity: 0, scale: 0.95 }} backgroundColor={colors.surfaceElevated} borderRadius={16} padding={Spacing["2xl"]} maxWidth={340} width="90%">
-            <YStack gap={Spacing.md}>
-              <AlertDialog.Title color={colors.textPrimary} fontSize={18} fontWeight="700">Cannot Delete</AlertDialog.Title>
-              <AlertDialog.Description color={colors.textSecondary} fontSize={14}>Default categories cannot be deleted.</AlertDialog.Description>
-              <XStack justifyContent="flex-end" marginTop={Spacing.sm}>
-                <AlertDialog.Action asChild>
-                  <Button label="OK" size="sm" onPress={() => setDefaultCategoryDialogOpen(false)} />
-                </AlertDialog.Action>
-              </XStack>
-            </YStack>
-          </AlertDialog.Content>
-        </AlertDialog.Portal>
-      </AlertDialog>
+      <ConfirmDialog
+        open={defaultCategoryDialogOpen}
+        onOpenChange={setDefaultCategoryDialogOpen}
+        title="Cannot Delete"
+        description="Default categories cannot be deleted."
+        confirmLabel="OK"
+        onConfirm={() => setDefaultCategoryDialogOpen(false)}
+      />
 
       {/* Confirm delete category */}
-      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <AlertDialog.Portal>
-          <AlertDialog.Overlay key="overlay" animation="quick" opacity={0.5} enterStyle={{ opacity: 0 }} exitStyle={{ opacity: 0 }} />
-          <AlertDialog.Content key="content" animation="quick" enterStyle={{ opacity: 0, scale: 0.95 }} exitStyle={{ opacity: 0, scale: 0.95 }} backgroundColor={colors.surfaceElevated} borderRadius={16} padding={Spacing["2xl"]} maxWidth={340} width="90%">
-            <YStack gap={Spacing.md}>
-              <AlertDialog.Title color={colors.textPrimary} fontSize={18} fontWeight="700">Delete "{pendingDeleteName}"?</AlertDialog.Title>
-              <AlertDialog.Description color={colors.textSecondary} fontSize={14}>Folders in this category will move to General.</AlertDialog.Description>
-              <XStack gap={Spacing.md} justifyContent="flex-end" marginTop={Spacing.sm}>
-                <AlertDialog.Cancel asChild>
-                  <Button label="Cancel" variant="ghost" size="sm" onPress={() => setDeleteDialogOpen(false)} />
-                </AlertDialog.Cancel>
-                <AlertDialog.Action asChild>
-                  <Button label="Delete" variant="danger" size="sm" onPress={onConfirmDelete} />
-                </AlertDialog.Action>
-              </XStack>
-            </YStack>
-          </AlertDialog.Content>
-        </AlertDialog.Portal>
-      </AlertDialog>
+      <ConfirmDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        title={`Delete "${pendingDeleteName}"?`}
+        description="Folders in this category will move to General."
+        confirmLabel="Delete"
+        cancelLabel="Cancel"
+        variant="danger"
+        onConfirm={onConfirmDelete}
+        onCancel={() => setDeleteDialogOpen(false)}
+      />
     </SafeAreaView>
   );
 };

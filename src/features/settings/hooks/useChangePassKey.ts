@@ -46,7 +46,9 @@ export const useChangePassKey = () => {
 
     const rows = await db.select().from(settings);
     const map: Record<string, string> = {};
-    rows.forEach((r) => { map[r.key] = r.value; });
+    rows.forEach((r) => {
+      map[r.key] = r.value;
+    });
 
     const phraseOk = verifyHash(passPhrase, map["passphrase_hash"] ?? "");
     const keyOk = verifyHash(currentKey, map["passkey_hash"] ?? "");
@@ -56,15 +58,17 @@ export const useChangePassKey = () => {
       const next = verifyAttempts + 1;
       setVerifyAttempts(next);
       if (next >= 3) {
-        setErrors({ general: "Too many failed attempts. Closing app for security." });
+        setErrors({
+          general: "Too many failed attempts. Closing app for security.",
+        });
         setTimeout(() => BackHandler.exitApp(), 1800);
         return;
       }
       const remaining = 3 - next;
       setErrors({
         general: `Incorrect credentials. ${remaining} attempt${remaining === 1 ? "" : "s"} remaining.`,
-        ...((!phraseOk) ? { passPhrase: "Incorrect Pass Phrase" } : {}),
-        ...((!keyOk) ? { currentKey: "Incorrect Pass Key" } : {}),
+        ...(!phraseOk ? { passPhrase: "Incorrect Pass Phrase" } : {}),
+        ...(!keyOk ? { currentKey: "Incorrect Pass Key" } : {}),
       });
       setPassPhrase("");
       setCurrentKey("");
@@ -83,7 +87,8 @@ export const useChangePassKey = () => {
     else if (parseInt(newKey, 10) > PASSKEY_MAX_VALUE)
       e.newKey = `Max value is ${PASSKEY_MAX_VALUE}`;
     if (newKey !== newKeyConfirm) e.newKeyConfirm = "Pass Keys do not match";
-    if (newKey === currentKey) e.newKey = "New Pass Key must be different from current";
+    if (newKey === currentKey)
+      e.newKey = "New Pass Key must be different from current";
     setErrors(e);
     if (Object.keys(e).length > 0) return;
 

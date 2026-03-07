@@ -11,11 +11,16 @@ export default function FolderDetailScreen() {
       onBack={hook.onBack}
       onMoreOptions={hook.onMoreOptions}
       onFilePress={hook.onFilePress}
+      onFileReveal={hook.onFileReveal}
+      onFileCopy={hook.onFileCopy}
+      onFileOpenLink={hook.onFileOpenLink}
       onDeleteFile={hook.onDeleteFile}
       onNewFile={hook.onNewFile}
       onDeleteFolder={hook.onDeleteFolder}
       onEditFolder={hook.onEditFolder}
       openMoreOptionSheet={hook.openMoreOptionSheet}
+      revealedFileId={hook.revealedFileId ?? null}
+      decryptedValue={hook.decryptedValue ?? null}
       deleteFileDialogOpen={hook.deleteFileDialogOpen}
       setDeleteFileDialogOpen={hook.setDeleteFileDialogOpen}
       onConfirmDeleteFile={hook.onConfirmDeleteFile}

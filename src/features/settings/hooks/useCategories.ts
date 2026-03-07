@@ -12,7 +12,8 @@ export const useCategories = () => {
 
   // Dialog state
   const [duplicateDialogOpen, setDuplicateDialogOpen] = useState(false);
-  const [defaultCategoryDialogOpen, setDefaultCategoryDialogOpen] = useState(false);
+  const [defaultCategoryDialogOpen, setDefaultCategoryDialogOpen] =
+    useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
   const [pendingDeleteName, setPendingDeleteName] = useState("");
