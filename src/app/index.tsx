@@ -2,7 +2,7 @@ import React from "react";
 import { useSplash } from "@features/splash/hooks/useSplash";
 import { SplashView } from "@features/splash/views/SplashView";
 
-export default function SplashScreen() {
+const SplashScreen = () => {
   const { fadeAnim, rot0, rot1, rot2, toggleTheme } = useSplash();
   return (
     <SplashView
@@ -13,4 +13,6 @@ export default function SplashScreen() {
       onToggleTheme={toggleTheme}
     />
   );
-}
+};
+
+export default SplashScreen;

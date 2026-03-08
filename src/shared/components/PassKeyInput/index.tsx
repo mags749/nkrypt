@@ -5,44 +5,11 @@ import { Text, View, XStack, YStack } from "tamagui";
 import { useColors } from "@context/providers/themeStore";
 import { BxIcon } from "@shared/components/BxIcon";
 import { Radius, Spacing } from "@shared/constants/design";
+import { PassKeyDots } from "./PassKeyDots";
 
 export const PASSKEY_MIN_LENGTH = 4;
 export const PASSKEY_MAX_LENGTH = 6;
 export const PASSKEY_MAX_VALUE = 999999;
-
-// ─── PassKeyDots ──────────────────────────────────────────────────────────────
-
-const PassKeyDots = ({
-  value,
-  maxLength,
-}: {
-  value: string;
-  maxLength: number;
-}) => {
-  const colors = useColors();
-  const visibleCount = Math.min(value.length + 1, maxLength);
-
-  return (
-    <XStack gap={Spacing.lg}>
-      {Array.from({ length: visibleCount }, (_, i) => {
-        const isFilled = i < value.length;
-        return (
-          <View
-            key={i}
-            width={16}
-            height={16}
-            borderRadius={8}
-            borderWidth={2}
-            backgroundColor={isFilled ? colors.textPrimary : "transparent"}
-            borderColor={isFilled ? colors.textPrimary : colors.border}
-          />
-        );
-      })}
-    </XStack>
-  );
-};
-
-// ─── PassKeyInput ─────────────────────────────────────────────────────────────
 
 interface PassKeyInputProps {
   value: string;

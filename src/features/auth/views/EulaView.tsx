@@ -37,6 +37,7 @@ const SECTIONS = [
 
 interface EulaViewProps {
   agreed: boolean;
+  isEulaAccepted: boolean;
   onToggleAgreed: () => void;
   isLoading: boolean;
   onAccept: () => void;
@@ -44,6 +45,7 @@ interface EulaViewProps {
 
 export const EulaView = ({
   agreed,
+  isEulaAccepted,
   onToggleAgreed,
   isLoading,
   onAccept,
@@ -99,41 +101,43 @@ export const EulaView = ({
           marginVertical={Spacing.sm}
         />
 
-        <XStack
-          onPress={onToggleAgreed}
-          alignItems="flex-start"
-          gap={Spacing.md}
-          pressStyle={{ opacity: 0.7 }}
-        >
+        {!isEulaAccepted && (
           <XStack
-            width={22}
-            height={22}
-            borderRadius={Radius.sm}
-            borderWidth={1.5}
-            borderColor={agreed ? colors.accent : colors.border}
-            backgroundColor={agreed ? colors.accent : "transparent"}
-            alignItems="center"
-            justifyContent="center"
-            marginTop={2}
-            flexShrink={0}
+            onPress={onToggleAgreed}
+            alignItems="flex-start"
+            gap={Spacing.md}
+            pressStyle={{ opacity: 0.7 }}
           >
-            {agreed && (
-              <BxIcon
-                name="bx-check"
-                size={13}
-                color={colors.accentForeground}
-              />
-            )}
+            <XStack
+              width={22}
+              height={22}
+              borderRadius={Radius.sm}
+              borderWidth={1.5}
+              borderColor={agreed ? colors.accent : colors.border}
+              backgroundColor={agreed ? colors.accent : "transparent"}
+              alignItems="center"
+              justifyContent="center"
+              marginTop={2}
+              flexShrink={0}
+            >
+              {agreed && (
+                <BxIcon
+                  name="bx-check"
+                  size={13}
+                  color={colors.accentForeground}
+                />
+              )}
+            </XStack>
+            <Text
+              flex={1}
+              fontSize={15}
+              color={colors.textPrimary}
+              lineHeight={22}
+            >
+              I have read and agree to the Terms of Use
+            </Text>
           </XStack>
-          <Text
-            flex={1}
-            fontSize={15}
-            color={colors.textPrimary}
-            lineHeight={22}
-          >
-            I have read and agree to the Terms of Use
-          </Text>
-        </XStack>
+        )}
       </ScrollView>
 
       <YStack
@@ -142,10 +146,9 @@ export const EulaView = ({
         backgroundColor={colors.background}
       >
         <Button
-          label="Accept & Continue"
+          label={!isEulaAccepted ? "Accept & Continue" : "Continue"}
           onPress={onAccept}
           loading={isLoading}
-          disabled={!agreed}
           fullWidth
         />
       </YStack>

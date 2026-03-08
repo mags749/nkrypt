@@ -2,7 +2,7 @@ import React from "react";
 import { useFolderDetail } from "@features/folders/hooks/useFolderDetail";
 import { FolderDetailView } from "@features/folders/views/FolderDetailView";
 
-export default function FolderDetailScreen() {
+const FolderDetailScreen = () => {
   const hook = useFolderDetail();
   return (
     <FolderDetailView
@@ -29,4 +29,6 @@ export default function FolderDetailScreen() {
       onConfirmDeleteFolder={hook.onConfirmDeleteFolder}
     />
   );
-}
+};
+
+export default FolderDetailScreen;

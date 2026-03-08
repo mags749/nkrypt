@@ -10,7 +10,7 @@ interface NkryptLogoProps {
  * nkrypt logo — three concentric decagons (10-sided polygons)
  * matching the splash screen design exactly.
  */
-export function NkryptLogo({ size = 160, color = "#000000" }: NkryptLogoProps) {
+const NkryptLogo = ({ size = 160, color = "#000000" }: NkryptLogoProps) => {
   const cx = size / 2;
   const cy = size / 2;
 
@@ -56,41 +56,6 @@ export function NkryptLogo({ size = 160, color = "#000000" }: NkryptLogoProps) {
       />
     </Svg>
   );
-}
+};
 
-// ─── Small icon variant (used in headers, login) ──────────────────────────────
-
-interface NkryptIconProps {
-  size?: number;
-  color?: string;
-}
-
-export function NkryptIcon({ size = 44, color = "#000000" }: NkryptIconProps) {
-  const cx = size / 2;
-  const cy = size / 2;
-
-  function points(radius: number): string {
-    return Array.from({ length: 8 }, (_, i) => {
-      const angle = (i * 2 * Math.PI) / 8 - Math.PI / 2;
-      return `${(cx + radius * Math.cos(angle)).toFixed(2)},${(cy + radius * Math.sin(angle)).toFixed(2)}`;
-    }).join(" ");
-  }
-
-  return (
-    <Svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
-      <Polygon
-        points={points((size / 2) * 0.88)}
-        fill="none"
-        stroke={color}
-        strokeWidth={1.8}
-      />
-      <Polygon
-        points={points((size / 2) * 0.62)}
-        fill="none"
-        stroke={color}
-        strokeWidth={1.4}
-        opacity={0.5}
-      />
-    </Svg>
-  );
-}
+export default NkryptLogo;

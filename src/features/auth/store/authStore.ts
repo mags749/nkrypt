@@ -44,6 +44,7 @@ interface AuthState {
   // ── Queries ────────────────────────────────────────────────────────────────
   checkSetupStatus: () => Promise<void>;
   getBiometricInfo: () => Promise<BiometricInfo>;
+  checkIsEulaAccepted: () => boolean;
 
   // ── Setup ──────────────────────────────────────────────────────────────────
   acceptEula: () => Promise<void>;
@@ -124,7 +125,10 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         isSetupComplete: map[KEY_SETUP_DONE] === "true",
         isEulaAccepted: map[KEY_EULA_ACCEPTED] === "true",
         isBiometricEnabled: map[KEY_BIOMETRIC_ENABLED] === "true",
-        status: map[KEY_SETUP_DONE] === "true" ? "unauthenticated" : "idle",
+        status:
+          map[KEY_SETUP_DONE] === "true" || map[KEY_EULA_ACCEPTED] === "true"
+            ? "unauthenticated"
+            : "idle",
       });
     } catch {
       set({ status: "unauthenticated" });
@@ -154,6 +158,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       return { available: false, enrolled: false, types: [] };
     }
   },
+
+  checkIsEulaAccepted: () => get().isEulaAccepted,
 
   // ── acceptEula ─────────────────────────────────────────────────────────────
   acceptEula: async () => {

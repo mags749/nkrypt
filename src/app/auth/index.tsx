@@ -2,7 +2,7 @@ import React from "react";
 import { useLogin } from "@features/auth/hooks/useLogin";
 import { LoginView } from "@features/auth/views/LoginView";
 
-export default function LoginScreen() {
+const LoginScreen = () => {
   const hook = useLogin();
   return (
     <LoginView
@@ -33,4 +33,6 @@ export default function LoginScreen() {
       }}
     />
   );
-}
+};
+
+export default LoginScreen;

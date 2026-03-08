@@ -102,7 +102,7 @@ export const SetupView = ({
             justifyContent="center"
             alignSelf="flex-start"
           >
-            <NkryptIcon size={36} color={colors.textPrimary} />
+            <NkryptIcon size={56} />
           </XStack>
 
           <Text

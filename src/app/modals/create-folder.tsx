@@ -2,7 +2,7 @@ import React from "react";
 import { useCreateFolder } from "@features/modals/hooks/useCreateFolder";
 import { CreateFolderView } from "@features/modals/views/CreateFolderView";
 
-export default function CreateFolderModal() {
+const CreateFolderModal = () => {
   const hook = useCreateFolder();
   return (
     <CreateFolderView
@@ -28,4 +28,6 @@ export default function CreateFolderModal() {
       onClose={hook.onClose}
     />
   );
-}
+};
+
+export default CreateFolderModal;

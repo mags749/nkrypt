@@ -6,15 +6,15 @@
 
 ## Stack
 
-| Layer | Tool | Reason |
-|---|---|---|
-| Framework | React Native + Expo (SDK 52) | Cross-platform, Expo Router for file-based navigation |
-| Navigation | Expo Router v4 | File-based, typed routes, modal support |
-| State | Zustand v5 | Selective subscriptions, no provider hell, performant |
-| Database | expo-sqlite + drizzle-orm | Local-only SQLite with type-safe queries |
-| Encryption | crypto-js (AES-256-CBC + PBKDF2) | AES-256, key derivation with 100k iterations |
-| Secure Storage | expo-secure-store | Hardware-backed keychain/keystore for passKey hash |
-| Icons | @expo/vector-icons (Feather) | Matches original app icon library |
+| Layer          | Tool                             | Reason                                                |
+| -------------- | -------------------------------- | ----------------------------------------------------- |
+| Framework      | React Native + Expo (SDK 52)     | Cross-platform, Expo Router for file-based navigation |
+| Navigation     | Expo Router v4                   | File-based, typed routes, modal support               |
+| State          | Zustand v5                       | Selective subscriptions, no provider hell, performant |
+| Database       | expo-sqlite + drizzle-orm        | Local-only SQLite with type-safe queries              |
+| Encryption     | crypto-js (AES-256-CBC + PBKDF2) | AES-256, key derivation with 100k iterations          |
+| Secure Storage | expo-secure-store                | Hardware-backed keychain/keystore for passKey hash    |
+| Icons          | @expo/vector-icons (Feather)     | Matches original app icon library                     |
 
 ---
 
@@ -78,10 +78,10 @@ nkrypt-v2/
 
 nkrypt requires both **Pass Phrase** and **Pass Key** to log in:
 
-| Credential | Purpose | Storage |
-|---|---|---|
-| Pass Phrase | Login verification only | PBKDF2 hash in SQLite |
-| Pass Key | AES-256 encryption/decryption | PBKDF2 hash in SecureStore (hardware-backed) |
+| Credential  | Purpose                       | Storage                                      |
+| ----------- | ----------------------------- | -------------------------------------------- |
+| Pass Phrase | Login verification only       | PBKDF2 hash in SQLite                        |
+| Pass Key    | AES-256 encryption/decryption | PBKDF2 hash in SecureStore (hardware-backed) |
 
 ### Encryption Details
 
@@ -93,12 +93,14 @@ nkrypt requires both **Pass Phrase** and **Pass Key** to log in:
 - **Only the credentials field** is encrypted — site and username are stored plaintext
 
 ### What is NEVER stored
+
 - ❌ Pass Phrase plaintext
 - ❌ Pass Key plaintext
 - ❌ Decrypted credentials at rest
 - ❌ Any data in cloud/network
 
 ### Memory Safety
+
 - Pass Key is held **in-memory only** during the authenticated session
 - Logging out immediately clears the in-memory Pass Key
 - On app restart, re-authentication is required
@@ -109,14 +111,14 @@ nkrypt requires both **Pass Phrase** and **Pass Key** to log in:
 
 Follows the **Clear Responsibility Model** from the coding standards:
 
-| State Type | Tool |
-|---|---|
-| Server/DB data | drizzle-orm queries (no cache duplication) |
-| Auth session | `useAuthStore` (Zustand) |
-| Folders data | `useFoldersStore` (Zustand) |
-| Files data | `useFilesStore` (Zustand) |
-| Theme / UI config | `useThemeStore` (Zustand) |
-| Local component state | `useState` / `useReducer` |
+| State Type            | Tool                                       |
+| --------------------- | ------------------------------------------ |
+| Server/DB data        | drizzle-orm queries (no cache duplication) |
+| Auth session          | `useAuthStore` (Zustand)                   |
+| Folders data          | `useFoldersStore` (Zustand)                |
+| Files data            | `useFilesStore` (Zustand)                  |
+| Theme / UI config     | `useThemeStore` (Zustand)                  |
+| Local component state | `useState` / `useReducer`                  |
 
 ---
 
@@ -173,6 +175,7 @@ npm run android
 ```
 
 ### Required additional package for module resolver:
+
 ```bash
 npm install --save-dev babel-plugin-module-resolver
 ```
@@ -181,16 +184,16 @@ npm install --save-dev babel-plugin-module-resolver
 
 ## Feature Screens
 
-| Screen | Route | Description |
-|---|---|---|
-| Splash | `/` | Animated logo, detects setup status |
-| Setup | `/auth/setup` | 2-step first-time credential creation |
-| Login | `/auth` | Pass Phrase + Pass Key login |
-| Folders | `/folders` | Categorized folder list |
-| Folder Detail | `/folders/[id]` | Files in folder |
-| File Detail | `/files/[id]` | Site, user, encrypted credentials |
-| Create Folder | `/modals/create-folder` | Modal — folder name + category |
-| Create File | `/modals/create-file` | Modal — site, user, credentials |
+| Screen          | Route                    | Description                           |
+| --------------- | ------------------------ | ------------------------------------- |
+| Splash          | `/`                      | Animated logo, detects setup status   |
+| Setup           | `/auth/setup`            | 2-step first-time credential creation |
+| Login           | `/auth`                  | Pass Phrase + Pass Key login          |
+| Folders         | `/folders`               | Categorized folder list               |
+| Folder Detail   | `/folders/[id]`          | Files in folder                       |
+| File Detail     | `/files/[id]`            | Site, user, encrypted credentials     |
+| Create Folder   | `/modals/create-folder`  | Modal — folder name + category        |
+| Create File     | `/modals/create-file`    | Modal — site, user, credentials       |
 | Pass Key Prompt | `/modals/passkey-prompt` | Modal — enter pass key to reveal/copy |
 
 ---

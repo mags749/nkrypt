@@ -2,7 +2,7 @@ import React from "react";
 import { useChangePassPhrase } from "@features/settings/hooks/useChangePassPhrase";
 import { ChangePassPhraseView } from "@features/settings/views/ChangePassPhraseView";
 
-export default function ChangePassPhraseScreen() {
+const ChangePassPhraseScreen = () => {
   const hook = useChangePassPhrase();
   return (
     <ChangePassPhraseView
@@ -22,4 +22,6 @@ export default function ChangePassPhraseScreen() {
       onBack={hook.onBack}
     />
   );
-}
+};
+
+export default ChangePassPhraseScreen;

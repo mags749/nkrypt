@@ -2,7 +2,7 @@ import React from "react";
 import { useSettings } from "@features/settings/hooks/useSettings";
 import { SettingsView } from "@features/settings/views/SettingsView";
 
-export default function SettingsScreen() {
+const SettingsScreen = () => {
   const hook = useSettings();
   return (
     <SettingsView
@@ -32,4 +32,6 @@ export default function SettingsScreen() {
       setBiometricErrorVisible={hook.setBiometricErrorVisible}
     />
   );
-}
+};
+
+export default SettingsScreen;

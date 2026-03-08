@@ -2,7 +2,7 @@ import React from "react";
 import { useChangePassKey } from "@features/settings/hooks/useChangePassKey";
 import { ChangePassKeyView } from "@features/settings/views/ChangePassKeyView";
 
-export default function ChangePassKeyScreen() {
+const ChangePassKeyScreen = () => {
   const hook = useChangePassKey();
   return (
     <ChangePassKeyView
@@ -33,4 +33,6 @@ export default function ChangePassKeyScreen() {
       onSave={hook.onSave}
     />
   );
-}
+};
+
+export default ChangePassKeyScreen;

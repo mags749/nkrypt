@@ -2,7 +2,7 @@ import React from "react";
 import { useCategories } from "@features/settings/hooks/useCategories";
 import { CategoriesView } from "@features/settings/views/CategoriesView";
 
-export default function CategoriesScreen() {
+const CategoriesScreen = () => {
   const hook = useCategories();
   return (
     <CategoriesView
@@ -27,4 +27,6 @@ export default function CategoriesScreen() {
       onConfirmDelete={hook.onConfirmDelete}
     />
   );
-}
+};
+
+export default CategoriesScreen;

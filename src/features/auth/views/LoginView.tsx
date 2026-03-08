@@ -86,7 +86,7 @@ export const LoginView = ({
               alignItems="center"
               justifyContent="center"
             >
-              <NkryptIcon size={40} color={colors.textPrimary} />
+              <NkryptIcon size={64} />
             </XStack>
           </YStack>
 

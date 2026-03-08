@@ -5,6 +5,7 @@ import { db } from "@infra/database/client";
 import { files } from "@infra/database/schema";
 import { encrypt, decrypt } from "@infra/crypto/cryptoService";
 import { useAuthStore } from "@features/auth/store/authStore";
+import { useFoldersStore } from "@features/folders/store/foldersStore";
 import type { NkryptFile } from "@shared/types";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -107,6 +108,7 @@ export const useFilesStore = create<FilesState>((set, get) => ({
     });
 
     await get().loadFilesForFolder(input.folderId);
+    await useFoldersStore.getState().loadFolders();
     return id;
   },
 
@@ -145,12 +147,16 @@ export const useFilesStore = create<FilesState>((set, get) => ({
 
     await db.update(files).set(patch).where(eq(files.id, id));
 
-    if (existingFile) await get().loadFilesForFolder(existingFile.folderId);
+    if (existingFile) {
+      await get().loadFilesForFolder(existingFile.folderId);
+      await useFoldersStore.getState().loadFolders();
+    }
   },
 
   deleteFile: async (id, folderId) => {
     await db.delete(files).where(eq(files.id, id));
     await get().loadFilesForFolder(folderId);
+    await useFoldersStore.getState().loadFolders();
   },
 
   decryptFileValue: (file, passKey) => {

@@ -76,15 +76,6 @@ export const FolderDetailView = ({
         <XStack onPress={onBack} pressStyle={{ opacity: 0.7 }}>
           <BxIcon name="bx-chevron-left" size={26} color={colors.textPrimary} />
         </XStack>
-        <Text
-          fontSize={20}
-          fontWeight="600"
-          letterSpacing={-0.3}
-          color={colors.textPrimary}
-          numberOfLines={1}
-        >
-          folder
-        </Text>
         <XStack
           onPress={() => onMoreOptions(true)}
           pressStyle={{ opacity: 0.7 }}
@@ -118,7 +109,7 @@ export const FolderDetailView = ({
             alignSelf="stretch"
             borderWidth={0.5}
             borderColor={colors.border}
-            marginHorizontal={Spacing["4xl"]}
+            marginHorizontal={Spacing.xl}
             marginVertical={Spacing.md}
           />
         )}

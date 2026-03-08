@@ -50,7 +50,3 @@ export const LoadingOverlay = ({
     </Dialog>
   );
 };
-
-export const InlineSpinner = ({ color }: { color: string }) => (
-  <ActivityIndicator size="small" color={color} />
-);

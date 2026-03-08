@@ -2,7 +2,7 @@ import React from "react";
 import { useSetup } from "@features/auth/hooks/useSetup";
 import { SetupView } from "@features/auth/views/SetupView";
 
-export default function SetupScreen() {
+const SetupScreen = () => {
   const hook = useSetup();
   return (
     <SetupView
@@ -36,4 +36,6 @@ export default function SetupScreen() {
       }}
     />
   );
-}
+};
+
+export default SetupScreen;

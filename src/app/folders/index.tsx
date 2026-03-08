@@ -2,7 +2,7 @@ import React from "react";
 import { useFoldersList } from "@features/folders/hooks/useFoldersList";
 import { FoldersView } from "@features/folders/views/FoldersView";
 
-export default function FoldersScreen() {
+const FoldersScreen = () => {
   const hook = useFoldersList();
   return (
     <FoldersView
@@ -17,4 +17,6 @@ export default function FoldersScreen() {
       onSettings={hook.onSettings}
     />
   );
-}
+};
+
+export default FoldersScreen;

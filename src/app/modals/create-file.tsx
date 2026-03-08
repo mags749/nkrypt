@@ -2,7 +2,7 @@ import React from "react";
 import { useCreateFile } from "@features/modals/hooks/useCreateFile";
 import { CreateFileView } from "@features/modals/views/CreateFileView";
 
-export default function CreateFileModal() {
+const CreateFileModal = () => {
   const hook = useCreateFile();
   return (
     <CreateFileView
@@ -23,4 +23,6 @@ export default function CreateFileModal() {
       onClose={hook.onClose}
     />
   );
-}
+};
+
+export default CreateFileModal;

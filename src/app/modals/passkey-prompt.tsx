@@ -2,7 +2,7 @@ import React from "react";
 import { usePassKeyPrompt } from "@features/modals/hooks/usePassKeyPrompt";
 import { PassKeyPromptView } from "@features/modals/views/PassKeyPromptView";
 
-export default function PassKeyPromptModal() {
+const PassKeyPromptModal = () => {
   const hook = usePassKeyPrompt();
   return (
     <PassKeyPromptView
@@ -21,4 +21,6 @@ export default function PassKeyPromptModal() {
       attemptCount={hook.attemptCount}
     />
   );
-}
+};
+
+export default PassKeyPromptModal;
