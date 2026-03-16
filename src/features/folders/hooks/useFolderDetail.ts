@@ -10,8 +10,7 @@ export const useFolderDetail = () => {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const folder = useFoldersStore((s) => s.getFolderById(id));
-  const { filesByFolder, loadFilesForFolder, deleteFile, decryptFileValue } =
-    useFilesStore();
+  const { filesByFolder, loadFilesForFolder, deleteFile } = useFilesStore();
   const files = filesByFolder[id] ?? [];
   const [openMoreOptionSheet, setMoreOptionVisibility] =
     useState<boolean>(false);
@@ -26,6 +25,7 @@ export const useFolderDetail = () => {
   const {
     fileId: revealedFileId,
     decryptedValue,
+    secondsLeft,
     clearRevealed,
   } = useRevealStore();
 
@@ -58,7 +58,7 @@ export const useFolderDetail = () => {
   /** Reveal / hide toggle for an encrypted file row — always requires passkey */
   const onFileReveal = useCallback(
     (fileId: string) => {
-      // If already revealed, hide it
+      // If already revealed, hide it immediately
       if (revealedFileId === fileId) {
         clearRevealed();
         return;
@@ -72,7 +72,11 @@ export const useFolderDetail = () => {
     [revealedFileId, clearRevealed, router],
   );
 
-  /** Copy file value — prompt passkey if encrypted and not yet revealed */
+  /**
+   * Copy file value.
+   * Change 1: encrypted files ALWAYS route through the passkey prompt —
+   * no silent session-key shortcut. The user must confirm intent each time.
+   */
   const onFileCopy = useCallback(
     (fileId: string) => {
       const file = (filesByFolder[id] ?? []).find((f) => f.id === fileId);
@@ -83,31 +87,13 @@ export const useFolderDetail = () => {
         return;
       }
 
-      // Already revealed? Copy directly
-      if (revealedFileId === fileId && decryptedValue !== null) {
-        void Clipboard.setStringAsync(decryptedValue);
-        return;
-      }
-
-      // Try session key
-      const plain = decryptFileValue(file);
-      if (plain !== null) {
-        void Clipboard.setStringAsync(plain);
-      } else {
-        router.push({
-          pathname: "/modals/passkey-prompt",
-          params: { fileId, mode: "copy" },
-        });
-      }
+      // Encrypted: always demand passkey regardless of session key / reveal state
+      router.push({
+        pathname: "/modals/passkey-prompt",
+        params: { fileId, mode: "copy" },
+      });
     },
-    [
-      filesByFolder,
-      id,
-      revealedFileId,
-      decryptedValue,
-      decryptFileValue,
-      router,
-    ],
+    [filesByFolder, id, router],
   );
 
   /** Open link value as URL */
@@ -155,6 +141,7 @@ export const useFolderDetail = () => {
     // Reveal state
     revealedFileId,
     decryptedValue,
+    secondsLeft,
     // Folder UI
     openMoreOptionSheet,
     onMoreOptions: (value: boolean) => setMoreOptionVisibility(value),

@@ -21,6 +21,7 @@ const FolderDetailScreen = () => {
       openMoreOptionSheet={hook.openMoreOptionSheet}
       revealedFileId={hook.revealedFileId ?? null}
       decryptedValue={hook.decryptedValue ?? null}
+      secondsLeft={hook.secondsLeft ?? null}
       deleteFileDialogOpen={hook.deleteFileDialogOpen}
       setDeleteFileDialogOpen={hook.setDeleteFileDialogOpen}
       onConfirmDeleteFile={hook.onConfirmDeleteFile}

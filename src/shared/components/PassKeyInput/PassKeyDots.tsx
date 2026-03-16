@@ -14,7 +14,7 @@ export const PassKeyDots = ({ value, maxLength }: PassKeyDotsProps) => {
   const visibleCount = Math.min(value.length + 1, maxLength);
 
   return (
-    <XStack gap={Spacing.lg} alignItems="center">
+    <XStack gap={Spacing.lg} alignItems="center" height={16}>
       {Array.from({ length: visibleCount }, (_, i) => {
         const isFilled = i < value.length;
         return (

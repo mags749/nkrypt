@@ -92,8 +92,8 @@ android {
         applicationId 'io.nkrypt.starter'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 10001
-        versionName "2.0.0"
+        versionCode 10002
+        versionName "2.0.1"
 
         buildConfigField "String", "REACT_NATIVE_RELEASE_LEVEL", "\"${findProperty('reactNativeReleaseLevel') ?: 'stable'}\""
     }
@@ -131,7 +131,8 @@ android {
     }
     packagingOptions {
         jniLibs {
-            useLegacyPackaging = false
+            def enableLegacyPackaging = findProperty('expo.useLegacyPackaging') ?: 'false'
+            useLegacyPackaging enableLegacyPackaging.toBoolean()
         }
     }
     androidResources {

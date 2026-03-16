@@ -28,6 +28,8 @@ interface FolderDetailViewProps {
   openMoreOptionSheet: boolean;
   revealedFileId: string | null;
   decryptedValue: string | null;
+  /** Change 2: seconds left before auto-hide kicks in */
+  secondsLeft: number | null;
   deleteFileDialogOpen: boolean;
   setDeleteFileDialogOpen: (open: boolean) => void;
   onConfirmDeleteFile: () => void;
@@ -52,6 +54,7 @@ export const FolderDetailView = ({
   openMoreOptionSheet,
   revealedFileId,
   decryptedValue,
+  secondsLeft,
   deleteFileDialogOpen,
   setDeleteFileDialogOpen,
   onConfirmDeleteFile,
@@ -123,6 +126,7 @@ export const FolderDetailView = ({
             onDelete={() => onDeleteFile(item.id)}
             isRevealed={revealedFileId === item.id}
             decryptedValue={revealedFileId === item.id ? decryptedValue : null}
+            secondsLeft={revealedFileId === item.id ? secondsLeft : null}
           />
         )}
         ListEmptyComponent={
